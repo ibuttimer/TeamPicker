@@ -96,12 +96,17 @@ def create_app(args: argparse.Namespace, test_config=None):
                          'SQLALCHEMY_TRACK_MODIFICATIONS']:
                     # Convert boolean variables.
                     value = eval_environ_var_truthy(k)
-                elif k in [DB_DRIVER]:
+                elif k in [DB_URI, DB_URI_ENV_VAR, DB_DRIVER, DB_USERNAME,
+                           DB_PASSWORD, DB_HOST]:
                     # Convert str or None variables.
                     value = eval_environ_var_none(k)
+                    if k == DB_URI_ENV_VAR and value is not None:
+                        # Read value Database URL environment variable.
+                        value = eval_environ_var_none(value)
                 elif k in [DB_PORT]:
                     # Convert integer variables.
-                    value = int(value)
+                    value = eval_environ_var_none(k)
+                    value = int(value) if value is not None else None
                 elif k in [ALGORITHMS]:
                     # Convert list of str variables.
                     value = list(map(str.strip,

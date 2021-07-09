@@ -59,7 +59,14 @@ def setup_db(app: Flask, config: dict, init: bool = False):
     :param config:   database configuration
     :param init:     initialise database
     """
-    connection_uri = make_connection_uri(app, config)
+    # Database URI precedence is:
+    # 1. DB_URI
+    # 2. DB_URI_ENV_VAR
+    # 3. make uri from DB_DIALECT etc.
+    connection_uri = config[DB_URI] or \
+        config[DB_URI_ENV_VAR] or \
+        make_connection_uri(app, config)
+    
     app.config["SQLALCHEMY_DATABASE_URI"] = connection_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app

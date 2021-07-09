@@ -5,7 +5,7 @@ The purpose of TeamPicker is to provide an application that enables the manageme
 Following registration, a manager must create a team during setup. 
 Subsequently, players may register and must select a team during setup. 
 Managers may then configure matches against other teams, and make their team selection from the list
-of players of their team. Following selection, players may confirm their availability. 
+of players registered with their team. Following selection, players may confirm their availability. 
 Please see [Role functionality](#role-functionality) for additional details.
 
 ## Getting Started
@@ -13,24 +13,26 @@ Please see [Role functionality](#role-functionality) for additional details.
 ### Application Layout
 The application structure is as follows:
 ```
-├─ README.md               - this file
-└─ backend                 - backend application
-   ├─ src                  - backend application code
-   │  ├─ team_picker       - application code 
-   │  │  │  ├─ auth        - authentication code
-   │  │  │  ├─ controllers - controllers for processing API requests
-   │  │  │  ├─ forms       - flask-wtf forms
-   │  │  │  ├─ models      - database ORM models
-   │  │  │  ├─ public      - javascript, css etc. files for UI
-   │  │  │  ├─ services    - service layer interfacing between controllers and database
-   │  │  │  ├─ templates   - jinja templates
-   │  │  │  └─ util        - miscellaneous application code
-   │  │  ├─ __init__.py    - application code 
-   │  │  └─ constants.py   - application constants 
-   │  └─ requirements.txt  - The dependencies to be installed, see Install dependencies
-   ├─ test                 - test scripts and Postman collection
-   ├─ instance             - application instance folder, to store configurations etc. outside of version control 
-   └─ migrations           - Flask-Migarate versions folder, to store database configurations 
+├─ README.md            - this file
+├─ API.md               - API specification
+├─ requirements.txt     - the dependencies to be installed, see Install dependencies
+├─ teampicker.py        - main script
+├─ src                  - backend application code
+│  └─ team_picker       - application code 
+│     │  ├─ auth        - authentication code
+│     │  ├─ controllers - controllers for processing API requests
+│     │  ├─ forms       - flask-wtf forms
+│     │  ├─ models      - database ORM models
+│     │  ├─ public      - javascript, css etc. files for UI
+│     │  ├─ services    - service layer interfacing between controllers and database
+│     │  ├─ templates   - jinja templates
+│     │  └─ util        - miscellaneous application code
+│     ├─ __init__.py    - application code 
+│     └─ constants.py   - application constants 
+├─ test                 - test scripts
+│  └─ postman           - Postman collection
+├─ instance             - application instance folder, to store configurations etc. outside of version control 
+└─ migrations           - Flask-Migarate versions folder, to store database configurations 
 ```
 
 ### API
@@ -76,6 +78,15 @@ Also see [Using requirements files](https://packaging.python.org/guides/installi
 #### Application Configuration
 The application utilises environments variables, or a combination of configuration files and environments variables to
 specify the application configuration. There are three methods of configuring the application:
+
+##### Database Configuration
+The database configuration must be set in one of three different ways. In order of precedence they are:
+1. Set the `DB_URI` variable to a [Connection URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#connection-uri-format).
+1. Set the `DB_URI_ENV_VAR` variable to the name of an environment variable which is set to a [Connection URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#connection-uri-format).
+    
+    E.g. A typical use case is with a Heroku Postgres add-on which adds a `DATABASE_URL` environment variable that contains the database URI.
+
+1. Set the `DB_DIALECT`,`DB_DRIVER`,`DB_USERNAME`,`DB_PASSWORD`,`DB_HOST`,`DB_PORT` and `DB_DATABASE` variables from which a [Connection URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#connection-uri-format) is created.
 
 ##### .env file
 * The configuration file should follow the format specified by [sample.env](instance/sample.env).
@@ -220,7 +231,7 @@ $ python teampicker.py --initdb                   > python teampicker.py --initd
 ```
 or passed via the `FLASK_APP` environment variable.
 ```bash
-  FLASK_APP=src.api:create_app({"initdb":True})
+  FLASK_APP=src.team_picker:create_app({"initdb":True})
 ```
 
 ### Run the application
@@ -243,7 +254,7 @@ $ python teampicker.py                            > python teampicker.py
 From a [Terminal Window](#terminal-window), run the following commands:
 ```bash
 For Linux and Mac:                                For Windows:
-$ export FLASK_APP=team_picker:create_app({})     > set FLASK_APP=team_picker:create_app({})
+$ export FLASK_APP=src.team_picker:create_app({}) > set FLASK_APP=src.team_picker:create_app({})
 $ export FLASK_ENV=development                    > set FLASK_ENV=development
 $ flask run                                       > flask run 
 ```
@@ -303,13 +314,13 @@ The [Auth0](https://auth0.com/) login credentials are the specified email and pa
 The first name, surname, role and team are suggestions.
 
 #### User setup using Postman
-To expedite the setup of these users on a new database, the [Postman](https://www.postman.com/) collection 
-[Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity FSWD TeamPicker.postman_collection.json) is available. 
+To expedite the setup of these users on a new database, the [Postman](https://www.postman.com/) collection
+[Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity%20FSWD%20TeamPicker.postman_collection.json) is available. 
 The manager user's data is available in [managers.json](test/postman/managers.json), 
 and player's in [players.json](test/postman/players.json). 
 
 ##### Setup managers
-* Load [Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity FSWD TeamPicker.postman_collection.json) into Postman.
+* Load [Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity%20FSWD%20TeamPicker.postman_collection.json) into Postman.
 * Open the collection and select the collection `Variables` tab. 
   Set the `run_mode` variable to `iteration`, and save if necessary.   
 * Select the `manager setup` folder from the collection.
@@ -327,9 +338,9 @@ All the folder requests will run 9 times, once for each player.
 Please see [Running collections with data files](https://learning.postman.com/docs/running-collections/working-with-data-files/) for more information.
 
 ###### Individual requests in Postman collection
-In order to send individual requests from [Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity FSWD TeamPicker.postman_collection.json)
+In order to send individual requests from [Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity%20FSWD%20TeamPicker.postman_collection.json)
 rather than the running in the listed order:
-* Load [Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity FSWD TeamPicker.postman_collection.json) into Postman.
+* Load [Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity%20FSWD%20TeamPicker.postman_collection.json) into Postman.
 * Open the collection and select the collection `Variables` tab.
   Set the `run_mode` variable to `individual`.
 * Set the `username`,`password`,`firstname`,`surname`,`role_name` and `team_name` appropriately in order to pass response tests.  
