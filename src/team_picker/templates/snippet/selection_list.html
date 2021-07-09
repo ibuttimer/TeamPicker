@@ -1,0 +1,108 @@
+<div>
+  <table class="table">
+    <thead>
+      <tr>
+        <!-- date | location | opposition -->
+        <th scope="col">
+          <i class="far fa-calendar-alt" ></i>
+        </th>
+        <th scope="col">
+          <i class="fas fa-map-marked-alt" title="Venue"
+             data-bs-toggle="tooltip" data-bs-placement="top"></i>
+        </th>
+        <th scope="col">
+          <i class="fas fa-users" title="Opposition"
+             data-bs-toggle="tooltip" data-bs-placement="top"></i>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td id="start-time">{{match.start_time}}</td>
+        <td id="venue">{{match.venue}}</td>
+        <td id="opposition">{{match.opposition}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div>
+  <table class="table">
+    <thead>
+      <tr>
+        <!-- name | select | confirmed -->
+        <th scope="col">Name</th>
+        {% if role.manager %}
+        <th scope="col">Selected</th>
+        {% endif %}
+        <th scope="col">Confirmed</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for player in player_list %}
+      <tr>
+        <td id="player-name-{{loop.index0}}">{{player.name}}</td>
+        {% if role.manager %}
+        <!-- Manager has selection option  -->
+        <td>
+          <button type="button" class="btn btn-default btn-sm"
+                  id="toggle-select-{{loop.index0}}" data-bs-href="{{player.toggle_select_url}}"
+                  data-bs-success_href="{{url_for('match_selections', match_id=match.id)}}">
+            <i id="select-status-{{loop.index0}}"
+              {% if player.selected %} class="far fa-check-square" title="Selected"
+              {% else %} class="far fa-square" title="Not Selected"
+              {% endif %}
+              data-bs-toggle="tooltip" data-bs-placement="top"></i>
+          </button>
+        </td>
+        {% endif %}
+        <td>
+          {% if player.is_self %}
+          <!-- Logged in player has confirm option  -->
+          <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btn_radio_y" id="toggle-confirm-y" autocomplete="off"
+                   {% if player.confirmed == 3 %} checked {% endif %}
+                   data-bs-href="{{player.confirm_select_url}}"
+                   data-bs-success_href="{{url_for('match_selections', match_id=match.id)}}"
+            >
+            <label class="btn btn-outline-success" for="toggle-confirm-y">
+              <i class="fas fa-check-circle" title="Confirm"
+                 data-bs-toggle="tooltip" data-bs-placement="top"></i>
+            </label>
+
+            <input type="radio" class="btn-check" name="btn_radio_m" id="toggle-confirm-m" autocomplete="off"
+                   {% if player.confirmed == 2 %} checked {% endif %}
+                   data-bs-href="{{player.confirm_select_url}}"
+                   data-bs-success_href="{{url_for('match_selections', match_id=match.id)}}"
+            >
+            <label class="btn btn-outline-warning" for="toggle-confirm-m">
+              <i class="fas fa-question-circle" title="Unsure"
+                 data-bs-toggle="tooltip" data-bs-placement="top"></i>
+            </label>
+
+            <input type="radio" class="btn-check" name="btn_radio_n" id="toggle-confirm-n" autocomplete="off"
+                   {% if player.confirmed == 1 %} checked {% endif %}
+                   data-bs-href="{{player.confirm_select_url}}"
+                   data-bs-success_href="{{url_for('match_selections', match_id=match.id)}}"
+            >
+            <label class="btn btn-outline-danger" for="toggle-confirm-n">
+              <i class="fas fa-times-circle" title="Not available"
+                 data-bs-toggle="tooltip" data-bs-placement="top"></i>
+            </label>
+          </div>
+          {% else %}
+          <!-- Other users can just view confirm info  -->
+          <i id="player-status-{{loop.index0}}"
+            {% if player.selected and player.confirmed == 3 %} class="fas fa-check-circle" title="Confirmed"
+            {% elif player.selected and player.confirmed == 1 %} class="fas fa-times-circle" title="Not available"
+            {% elif player.selected %} class="fas fa-question-circle" title="Unconfirmed"
+            {% else %} class="fas fa-minus-circle" title="Not applicable"
+            {% endif %}
+              data-bs-toggle="tooltip" data-bs-placement="top"></i>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+

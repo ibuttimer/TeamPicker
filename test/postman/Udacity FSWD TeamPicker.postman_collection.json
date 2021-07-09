@@ -1,0 +1,1124 @@
+{
+	"info": {
+		"_postman_id": "4193bfa3-8818-47dc-a2e7-6a843834b32c",
+		"name": "Udacity FSWD TeamPicker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "manager setup",
+			"item": [
+				{
+					"name": "Dashboard (no auth)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Redirected to login\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Log in to\");\r",
+									"    pm.expect(pm.response.text()).to.include(\"to continue to TeamPicker\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/dashboard",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get access token (manager)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Body contains access token\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.access_token).to.be.a('string')\r",
+									"\r",
+									"    // store access token for subsequent tests\r",
+									"    pm.collectionVariables.set(\"access_token\", jsonData.access_token)    \r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{username}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}",
+									"type": "text"
+								},
+								{
+									"key": "audience",
+									"value": "{{identifier}}",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid profile email",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://{{auth0_domain}}/oauth/token",
+							"protocol": "https",
+							"host": [
+								"{{auth0_domain}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						},
+						"description": "Request an access token via the Auth0 [Resource Owner Password Flow](https://auth0.com/docs/flows/resource-owner-password-flow)."
+					},
+					"response": []
+				},
+				{
+					"name": "Login -> create user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Load the HTML response to $\r",
+									"const $ = cheerio.load(pm.response.text());\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"function get_variable(name) {\r",
+									"    let value;\r",
+									"    let mode = pm.collectionVariables.get(\"run_mode\");\r",
+									"    if (mode == pm.collectionVariables.get(\"run_mode_iteration\")) {\r",
+									"        // running in iteration mode, use iteration variables\r",
+									"        value = pm.iterationData.get(name);\r",
+									"    } else {\r",
+									"        // running in collection mode, use collection variables\r",
+									"        value = pm.collectionVariables.get(name)\r",
+									"    }\r",
+									"    console.log(\"mode[\"+mode+\"]: \" + name + \" = '\" + value + \"'\");\r",
+									"    return value;\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Listing is correct\", () => {\r",
+									"\r",
+									"    // test existance of menu\r",
+									"    pm.expect($(\"a#menu_home\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_matches\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_list\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_search\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_new\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_logout\").length > 0).to.be.true;\r",
+									"\r",
+									"    // test page body\r",
+									"    pm.expect($(\"h2#welcome_user\").text()).to.contain(get_variable(\"username\"));\r",
+									"    pm.expect($(\"h3[class=form-heading]\").text()).to.contain(\"Create user\");\r",
+									"\r",
+									"    // test existance of expected input fields\r",
+									"    pm.expect($(\"input#csrf_token\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"input#name\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"input#surname\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"select#role_id\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"input[type=submit]\").length > 0).to.be.true;\r",
+									"\r",
+									"    // store csrf token for subsequent tests\r",
+									"    pm.collectionVariables.set(\"csrf_token\", $(\"input#csrf_token\").attr('value'));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"access_token\": \"{{access_token}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/login/token",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"login",
+								"token"
+							]
+						},
+						"description": "Login using an access token."
+					},
+					"response": []
+				},
+				{
+					"name": "Create user -> create team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Load the HTML response to $\r",
+									"const $ = cheerio.load(pm.response.text());\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"function get_variable(name) {\r",
+									"    let value;\r",
+									"    let mode = pm.collectionVariables.get(\"run_mode\");\r",
+									"    if (mode == pm.collectionVariables.get(\"run_mode_iteration\")) {\r",
+									"        // running in iteration mode, use iteration variables\r",
+									"        value = pm.iterationData.get(name);\r",
+									"    } else {\r",
+									"        // running in collection mode, use collection variables\r",
+									"        value = pm.collectionVariables.get(name)\r",
+									"    }\r",
+									"    console.log(\"mode[\"+mode+\"]: \" + name + \" = '\" + value + \"'\");\r",
+									"    return value;\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Listing is correct\", () => {\r",
+									"  \r",
+									"    // test existance of menu\r",
+									"    pm.expect($(\"a#menu_home\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_matches\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_list\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_search\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_new\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_logout\").length > 0).to.be.true;\r",
+									"\r",
+									"    // test page body\r",
+									"    pm.expect($(\"h2#welcome_user\").text()).to.contain(get_variable(\"firstname\"));\r",
+									"    pm.expect($(\"h3[class=form-heading]\").text()).to.contain(\"Create team\");\r",
+									"    // test existance of expected input fields\r",
+									"    pm.expect($(\"input#csrf_token\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"input#name\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"input[type=submit]\").length > 0).to.be.true;\r",
+									"\r",
+									"    // store csrf token for subsequent tests\r",
+									"    pm.collectionVariables.set(\"csrf_token\", $(\"input#csrf_token\").attr('value'));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "{{firstname}}",
+									"type": "text"
+								},
+								{
+									"key": "surname",
+									"value": "{{surname}}",
+									"type": "text"
+								},
+								{
+									"key": "role_id",
+									"value": "{{manager_role}}",
+									"type": "text"
+								},
+								{
+									"key": "csrf_token",
+									"value": "{{csrf_token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/users/setup",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"setup"
+							]
+						},
+						"description": "Login using an access token."
+					},
+					"response": []
+				},
+				{
+					"name": "Create team -> dashboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Load the HTML response to $\r",
+									"const $ = cheerio.load(pm.response.text());\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"function get_variable(name) {\r",
+									"    let value;\r",
+									"    let mode = pm.collectionVariables.get(\"run_mode\");\r",
+									"    if (mode == pm.collectionVariables.get(\"run_mode_iteration\")) {\r",
+									"        // running in iteration mode, use iteration variables\r",
+									"        value = pm.iterationData.get(name);\r",
+									"    } else {\r",
+									"        // running in collection mode, use collection variables\r",
+									"        value = pm.collectionVariables.get(name)\r",
+									"    }\r",
+									"    console.log(\"mode[\"+mode+\"]: \" + name + \" = '\" + value + \"'\");\r",
+									"    return value;\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Listing is correct\", () => {\r",
+									"  \r",
+									"    // test existance of menu\r",
+									"    pm.expect($(\"a#menu_home\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_matches\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_match_list\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_match_search\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_match_new\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_logout\").length > 0).to.be.true;\r",
+									"\r",
+									"    // test page body\r",
+									"    pm.expect($(\"h2#welcome_user\").text()).to.contain(get_variable(\"firstname\"));\r",
+									"    pm.expect($(\"h3#team_info\").text()).to.contain(get_variable(\"team_name\"));\r",
+									"    pm.expect($(\"span#user_badge\").text()).to.contain(get_variable(\"role_name\"));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "{{team_name}}",
+									"type": "text"
+								},
+								{
+									"key": "csrf_token",
+									"value": "{{csrf_token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/teams/setup",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"teams",
+								"setup"
+							]
+						},
+						"description": "Login using an access token."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Load the HTML response to $\r",
+									"const $ = cheerio.load(pm.response.text());\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Listing is correct\", () => {\r",
+									"\r",
+									"    // test existance of menu\r",
+									"    pm.expect($(\"a#menu_home\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_matches\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_list\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_search\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_new\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_logout\").length > 0).to.be.false;\r",
+									"\r",
+									"    // test existance of expected fields\r",
+									"    pm.expect($(\"a#qsLoginBtn\").length > 0).to.be.true;\r",
+									"\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "player setup",
+			"item": [
+				{
+					"name": "Dashboard (no auth)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Redirected to login\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Log in to\");\r",
+									"    pm.expect(pm.response.text()).to.include(\"to continue to TeamPicker\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/dashboard",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get access token (player)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Body contains access token\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.access_token).to.be.a('string')\r",
+									"\r",
+									"    // store access token for subsequent tests\r",
+									"    pm.collectionVariables.set(\"access_token\", jsonData.access_token)    \r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{username}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}",
+									"type": "text"
+								},
+								{
+									"key": "audience",
+									"value": "{{identifier}}",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid profile email",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://{{auth0_domain}}/oauth/token",
+							"protocol": "https",
+							"host": [
+								"{{auth0_domain}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						},
+						"description": "Request an access token via the Auth0 [Resource Owner Password Flow](https://auth0.com/docs/flows/resource-owner-password-flow)."
+					},
+					"response": []
+				},
+				{
+					"name": "Login -> create user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Load the HTML response to $\r",
+									"const $ = cheerio.load(pm.response.text());\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"function get_variable(name) {\r",
+									"    let value;\r",
+									"    let mode = pm.collectionVariables.get(\"run_mode\");\r",
+									"    if (mode == pm.collectionVariables.get(\"run_mode_iteration\")) {\r",
+									"        // running in iteration mode, use iteration variables\r",
+									"        value = pm.iterationData.get(name);\r",
+									"    } else {\r",
+									"        // running in collection mode, use collection variables\r",
+									"        value = pm.collectionVariables.get(name)\r",
+									"    }\r",
+									"    console.log(\"mode[\"+mode+\"]: \" + name + \" = '\" + value + \"'\");\r",
+									"    return value;\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Listing is correct\", () => {\r",
+									"\r",
+									"    // test existance of menu\r",
+									"    pm.expect($(\"a#menu_home\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_matches\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_list\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_search\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_new\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_logout\").length > 0).to.be.true;\r",
+									"\r",
+									"    // test page body\r",
+									"    pm.expect($(\"h2#welcome_user\").text()).to.contain(get_variable(\"username\"));\r",
+									"    pm.expect($(\"h3[class=form-heading]\").text()).to.contain(\"Create user\");\r",
+									"\r",
+									"    // test existance of expected input fields\r",
+									"    pm.expect($(\"input#csrf_token\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"input#name\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"input#surname\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"select#role_id\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"input[type=submit]\").length > 0).to.be.true;\r",
+									"\r",
+									"    // store csrf token for subsequent tests\r",
+									"    pm.collectionVariables.set(\"csrf_token\", $(\"input#csrf_token\").attr('value'));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"access_token\": \"{{access_token}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/login/token",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"login",
+								"token"
+							]
+						},
+						"description": "Login using an access token."
+					},
+					"response": []
+				},
+				{
+					"name": "Create user -> set team",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Load the HTML response to $\r",
+									"const $ = cheerio.load(pm.response.text());\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"function get_variable(name) {\r",
+									"    let value;\r",
+									"    let mode = pm.collectionVariables.get(\"run_mode\");\r",
+									"    if (mode == pm.collectionVariables.get(\"run_mode_iteration\")) {\r",
+									"        // running in iteration mode, use iteration variables\r",
+									"        value = pm.iterationData.get(name);\r",
+									"    } else {\r",
+									"        // running in collection mode, use collection variables\r",
+									"        value = pm.collectionVariables.get(name)\r",
+									"    }\r",
+									"    console.log(\"mode[\"+mode+\"]: \" + name + \" = '\" + value + \"'\");\r",
+									"    return value;\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Listing is correct\", () => {\r",
+									"  \r",
+									"    // test existance of menu\r",
+									"    pm.expect($(\"a#menu_home\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_matches\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_list\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_search\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_new\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_logout\").length > 0).to.be.true;\r",
+									"\r",
+									"    // test page body\r",
+									"    pm.expect($(\"h2#welcome_user\").text()).to.contain(get_variable(\"firstname\"));\r",
+									"    pm.expect($(\"h3[class=form-heading]\").text()).to.contain(\"Set team\");\r",
+									"    // test existance of expected input fields\r",
+									"    pm.expect($(\"input#csrf_token\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"select#team_id\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"input[type=submit]\").length > 0).to.be.true;\r",
+									"\r",
+									"    // store csrf token for subsequent tests\r",
+									"    pm.collectionVariables.set(\"csrf_token\", $(\"input#csrf_token\").attr('value'));\r",
+									"\r",
+									"    // store team id for subsequent tests\r",
+									"    let team_name = get_variable(\"team_name\")\r",
+									"    console.log(\"team \" + team_name);\r",
+									"    $(\"select#team_id\").children().each(function (i, e) {\r",
+									"        console.log(\"child \" + $(this).text());\r",
+									"        if ($(this).text() == team_name) {\r",
+									"            let id = $(this).attr('value');\r",
+									"            pm.collectionVariables.set(\"team_id\", id);\r",
+									"            console.log(\"Found id \" + id + \" for team \" + team_name);\r",
+									"        }\r",
+									"    });\r",
+									"\r",
+									"    // store submit url for subsequent tests\r",
+									"    pm.collectionVariables.set(\"target_url\", $(\"form[class=form]\").attr(\"action\"));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "{{firstname}}",
+									"type": "text"
+								},
+								{
+									"key": "surname",
+									"value": "{{surname}}",
+									"type": "text"
+								},
+								{
+									"key": "role_id",
+									"value": "{{player_role}}",
+									"type": "text"
+								},
+								{
+									"key": "csrf_token",
+									"value": "{{csrf_token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/users/setup",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"users",
+								"setup"
+							]
+						},
+						"description": "Login using an access token."
+					},
+					"response": []
+				},
+				{
+					"name": "Set team -> dashboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Load the HTML response to $\r",
+									"const $ = cheerio.load(pm.response.text());\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"function get_variable(name) {\r",
+									"    let value;\r",
+									"    let mode = pm.collectionVariables.get(\"run_mode\");\r",
+									"    if (mode == pm.collectionVariables.get(\"run_mode_iteration\")) {\r",
+									"        // running in iteration mode, use iteration variables\r",
+									"        value = pm.iterationData.get(name);\r",
+									"    } else {\r",
+									"        // running in collection mode, use collection variables\r",
+									"        value = pm.collectionVariables.get(name)\r",
+									"    }\r",
+									"    console.log(\"mode[\"+mode+\"]: \" + name + \" = '\" + value + \"'\");\r",
+									"    return value;\r",
+									"}\r",
+									"\r",
+									"pm.test(\"Listing is correct\", () => {\r",
+									"  \r",
+									"    // test existance of menu\r",
+									"    pm.expect($(\"a#menu_home\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_matches\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_match_list\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_match_search\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_match_new\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_logout\").length > 0).to.be.true;\r",
+									"\r",
+									"    // test page body\r",
+									"    pm.expect($(\"h2#welcome_user\").text()).to.contain(get_variable(\"firstname\"));\r",
+									"    pm.expect($(\"h3#team_info\").text()).to.contain(get_variable(\"team_name\"));\r",
+									"    pm.expect($(\"span#user_badge\").text()).to.contain(get_variable(\"role_name\"));\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "team_id",
+									"value": "{{team_id}}",
+									"type": "text"
+								},
+								{
+									"key": "csrf_token",
+									"value": "{{csrf_token}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}{{target_url}}",
+							"host": [
+								"{{host}}{{target_url}}"
+							]
+						},
+						"description": "Login using an access token."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Load the HTML response to $\r",
+									"const $ = cheerio.load(pm.response.text());\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Listing is correct\", () => {\r",
+									"\r",
+									"    // test existance of menu\r",
+									"    pm.expect($(\"a#menu_home\").length > 0).to.be.true;\r",
+									"    pm.expect($(\"a#menu_matches\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_list\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_search\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_match_new\").length > 0).to.be.false;\r",
+									"    pm.expect($(\"a#menu_logout\").length > 0).to.be.false;\r",
+									"\r",
+									"    // test existance of expected fields\r",
+									"    pm.expect($(\"a#qsLoginBtn\").length > 0).to.be.true;\r",
+									"\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/logout",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "noauth"
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Get userinfo",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{auth0_domain}}/userinfo",
+					"protocol": "https",
+					"host": [
+						"{{auth0_domain}}"
+					],
+					"path": [
+						"userinfo"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "run_mode_iteration",
+			"value": "iteration"
+		},
+		{
+			"key": "run_mode_individual",
+			"value": "individual"
+		},
+		{
+			"key": "run_mode",
+			"value": ""
+		},
+		{
+			"key": "auth0_domain",
+			"value": ""
+		},
+		{
+			"key": "identifier",
+			"value": ""
+		},
+		{
+			"key": "client_id",
+			"value": ""
+		},
+		{
+			"key": "allowed_callback_url",
+			"value": ""
+		},
+		{
+			"key": "allowed_logout_url",
+			"value": ""
+		},
+		{
+			"key": "client_secret",
+			"value": ""
+		},
+		{
+			"key": "host",
+			"value": ""
+		},
+		{
+			"key": "manager_role",
+			"value": "1"
+		},
+		{
+			"key": "player_role",
+			"value": "2"
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "csrf_token",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "firstname",
+			"value": ""
+		},
+		{
+			"key": "surname",
+			"value": ""
+		},
+		{
+			"key": "role_name",
+			"value": ""
+		},
+		{
+			"key": "team_name",
+			"value": ""
+		},
+		{
+			"key": "team_id",
+			"value": ""
+		},
+		{
+			"key": "target_url",
+			"value": ""
+		}
+	]
+}

@@ -1,0 +1,34 @@
+<div class="col-sm-12">
+  <form class="form" method="post" action="{{submit_action}}">
+    {{ form.hidden_tag() }}
+    <h3 class="form-heading">{{ heading }}</h3>
+
+    <div class="form-group">
+      <label>Opposition</label>
+      <div class="form-group">
+        {{ form.opposition(class_ = 'form-control', placeholder='Opposition', autofocus = true) }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Date</label>
+      <div class="form-inline">
+        <div class="form-group">
+          {% for subfield in form.date_range %}
+          <tr>
+            <td>{{ subfield }}</td>
+            <td>{{ subfield.label }}&nbsp;</td>
+          </tr>
+          {% endfor %}
+        </div>
+        <div class="form-group col-sm-4">
+          {{ form.start_time(class_ = 'form-control dpick', placeholder='YYYY-MM-DD', autofocus = true) }}
+        </div>
+      </div>
+    </div>
+
+    {% include 'snippet/form_errors.html' %}
+
+    {% include 'snippet/cancel_submit_btns.html' %}
+  </form>
+</div>

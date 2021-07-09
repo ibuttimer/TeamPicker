@@ -1,0 +1,15 @@
+<form id="set_team_form" class="form" method="post" action="{{submit_action}}">
+  {{ form.hidden_tag() }}
+  <h3 class="form-heading">Set team</h3>
+
+  <div class="form-group">
+    <label>Team</label>
+    <div class="form-group">
+      {{ form.team_id(class_ = 'form-control', placeholder='Team', autofocus = true) }}
+    </div>
+  </div>
+
+  {% include 'snippet/form_errors.html' %}
+
+  <input type="submit" value="Set" class="btn btn-primary btn-lg btn-block" title="Set">
+</form>

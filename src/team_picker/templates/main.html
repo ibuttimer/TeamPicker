@@ -1,0 +1,135 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+<title>{% block title %}{% endblock %}</title>
+
+<!-- meta -->
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- /meta -->
+
+<!-- styles -->
+<link type="text/css" rel="stylesheet" href="/public/dist/css/bootstrap.min.css">
+<link type="text/css" rel="stylesheet" href="/public/css/layout.main.css">
+<!-- /styles -->
+
+<script src="https://kit.fontawesome.com/f561d6c0a0.js" crossorigin="anonymous"></script>
+
+<!-- favicons -->
+<!--<link rel="shortcut icon" href="/static/ico/favicon.png">-->
+<!--<link rel="shortcut icon" href="/static/ico/favicon.png">-->
+<!-- /favicons -->
+
+</head>
+<body>
+  <!-- Wrap all page content here -->
+  <div id="wrap">
+
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">TeamPicker</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <li class="nav-item">
+              {% with %}
+                {% if logged_in %}
+                  {% set fxn = 'dashboard' %}
+                {% else %}
+                  {% set fxn = 'home' %}
+                {% endif %}
+              <a {%- if request.path == url_for(fxn) %}
+                class="nav-link active" aria-current="page"
+                {% else %}
+                class="nav-link"
+                {% endif %}
+                id="menu_home" href="{{ url_for(fxn) }}">Home</a>
+              {% endwith %}
+            </li>
+            {% if setup_complete %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="menu_matches" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Matches
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="menu_matches">
+                <li><a id="menu_match_list" class="dropdown-item" href="{{url_for('matches_ui')+'?order=date_desc'}}">List</a></li>
+                <li><a id="menu_match_search" class="dropdown-item" href="{{url_for('matches_ui')+'?search=y'}}">Search Match</a></li>
+                {% if role.manager %}
+                <li><hr class="dropdown-divider"></li>
+                <li><a id="menu_match_new" class="dropdown-item" href="{{url_for('matches_ui')+'?new=y'}}">New Match</a></li>
+                {% endif %}
+              </ul>
+            </li>
+          {% endif %}
+          {% if logged_in %}
+            <li class="nav-item">
+              <span type="button" class="nav-link" data-bs-toggle="modal" data-bs-target="#show-jwt"
+                      title="Show JWT">JWT
+              </span>
+            </li>
+          {% endif %}
+          </ul>
+          {% if logged_in %}
+            <div class="d-flex justify-content-end">
+              <img src="{{userinfo.picture}}" class="img-fluid" style="max-width:15%;"
+                   alt="{{userinfo.fullname}}" title="{{userinfo.fullname}}"
+                   data-bs-toggle="tooltip" data-bs-placement="bottom">
+              &nbsp;
+              <a id="menu_logout" class="btn btn-outline-primary" href="/logout">Logout</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <!-- Begin page content -->
+    <main id="content" role="main" class="container">
+      {% block content %}{% endblock %}
+    </main>
+
+  </div>
+
+  <div id="footer">
+    <div class="container">
+      <p>TeamPicker &copy; All Rights Reserved.</p>
+      {% block footer %}{% endblock %}
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script type="text/javascript" src="/public/js/jquery-3.6.0.js"><\/script>')</script>
+  <script type="text/javascript" src="/public/dist/js/bootstrap.bundle.min.js" defer></script>
+
+  <!-- datepicker related, see https://www.npmjs.com/package/jquery-datetimepicker -->
+  <link rel="stylesheet" type="text/css" href="/public/css/jquery.datetimepicker.min.css"/>
+  <script src="/public/js/jquery.datetimepicker.full.min.js"></script>
+
+  <script type="text/javascript" src="/public/js/plugins.js" defer></script>
+
+  <!-- JWT display modal -->
+  <div class="modal fade" tabindex="-1" id="show-jwt" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+          <h4 class="modal-title">JWT</h4>
+        </div>
+        <div class="modal-body">
+          <div class="card">
+            <div class="card-body">
+              <p class="card-text">{{userinfo.access_token}}</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+
+</body>

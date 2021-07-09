@@ -1,0 +1,15 @@
+<form id="new_team_form" class="form" method="post" action="{{submit_action}}">
+  {{ form.hidden_tag() }}
+  <h3 class="form-heading">Create team</h3>
+
+  <div class="form-group">
+    <label>Name</label>
+    <div class="form-group">
+      {{ form.name(class_ = 'form-control', placeholder='Name', autofocus = true) }}
+    </div>
+  </div>
+
+  {% include 'snippet/form_errors.html' %}
+
+  {% include 'snippet/submit_btn.html' %}
+</form>

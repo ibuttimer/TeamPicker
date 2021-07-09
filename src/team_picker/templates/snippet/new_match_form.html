@@ -1,0 +1,79 @@
+<form class="form" method="post" action="{{submit_action}}">
+  {{ form.hidden_tag() }}
+  <h3 class="form-heading">{{ heading }}</h3>
+
+  <div class="input-group">
+    <div class="row col-sm-6">
+      <div class="col col-sm-2">
+        <label class="form-label">Venue</label>
+      </div>
+      <div class="col col-sm-4">
+        {% for subfield in form.venue %}
+        <tr>
+          <td>{{ subfield }}</td>
+          <td>{{ subfield.label(
+            **{'data-bs-toggle': "tooltip", 'data-bs-placement': "top", 'title': subfield.label.text + " fixture"}
+            ) }}</td>
+        </tr>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row col-sm-6">
+      <div class="col col-sm-3">
+        <label class="form-label">Result</label>
+      </div>
+      <div class="col col-sm-3">
+        <tr>
+          <td>{{ form.result(
+                    **{'data-bs-toggle': "tooltip", 'data-bs-placement': "top", 'title': "Check to mark as final result"}
+            ) }}
+          </td>
+        </tr>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <div class="row col-sm-6">
+      <div class="col col-sm-2">
+        <label class="form-label">Opposition</label>
+      </div>
+      <div class="col col-sm-6">
+        {{ form.opposition(class_ = 'form-control', placeholder='Opposition', autofocus=true,
+                            **{'data-bs-toggle': "tooltip", 'data-bs-placement': "top", 'title': "Select opposition team"}) }}
+      </div>
+    </div>
+    <div class="row col-sm-6">
+      <div class="col col-sm-3">
+        <label class="form-label">Team score</label>
+      </div>
+      <div class="col col-sm-2">
+        {{ form.team_score(class_ = 'form-control', placeholder='Team score', autofocus=true,
+                            **{'data-bs-toggle': "tooltip", 'data-bs-placement': "top", 'title': "Enter team score"}) }}
+      </div>
+      <div class="col col-sm-3">
+        <label class="form-label">Opposition score</label>
+      </div>
+      <div class="col col-sm-2">
+        {{ form.opposition_score(class_ = 'form-control', placeholder='Opposition score', autofocus=true,
+                            **{'data-bs-toggle': "tooltip", 'data-bs-placement': "top", 'title': "Enter opposition team score"}) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <div class="row col-sm-6">
+      <div class="col col-sm-2">
+        <label class="form-label">Start time</label>
+      </div>
+      <div class="col col-sm-4">
+        {{ form.start_time(class_ = 'form-control dtpick', placeholder='YYYY-MM-DD HH:MM', autofocus = true,
+                            **{'data-bs-toggle': "tooltip", 'data-bs-placement': "top", 'title': "Enter match start time"}) }}
+      </div>
+    </div>
+  </div>
+
+  {% include 'snippet/form_errors.html' %}
+
+  {% include 'snippet/cancel_submit_btns.html' %}
+</form>

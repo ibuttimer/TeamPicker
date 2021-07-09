@@ -1,0 +1,64 @@
+[{
+  "username": "p1@team1.com",
+  "password": "Player1!",
+  "firstname": "Patrik",
+  "surname": "Einer",
+  "role_name": "Player",
+  "team_name": "Team 1"
+}, {
+  "username": "p2@team1.com",
+  "password": "Player2!",
+  "firstname": "Pat",
+  "surname": "Ceann",
+  "role_name": "Player",
+  "team_name": "Team 1"
+}, {
+  "username": "p3@team1.com",
+  "password": "Player3!",
+  "firstname": "Patrice",
+  "surname": "Un",
+  "role_name": "Player",
+  "team_name": "Team 1"
+}, {
+  "username": "j1@team2.com",
+  "password": "Player1!",
+  "firstname": "Johann",
+  "surname": "Zwei",
+  "role_name": "Player",
+  "team_name": "Team 2"
+}, {
+  "username": "j2@team2.com",
+  "password": "Player2!",
+  "firstname": "Sean",
+  "surname": "Do",
+  "role_name": "Player",
+  "team_name": "Team 2"
+}, {
+  "username": "j3@team2.com",
+  "password": "Player3!",
+  "firstname": "Jean",
+  "surname": "Deux",
+  "role_name": "Player",
+  "team_name": "Team 2"
+}, {
+  "username": "s1@team3.com",
+  "password": "Player1!",
+  "firstname": "Joanna",
+  "surname": "Drei",
+  "role_name": "Player",
+  "team_name": "Team 3"
+}, {
+  "username": "s2@team3.com",
+  "password": "Player2!",
+  "firstname": "Dearbhla",
+  "surname": "Triur",
+  "role_name": "Player",
+  "team_name": "Team 3"
+}, {
+  "username": "s3@team3.com",
+  "password": "Player3!",
+  "firstname": "Jean",
+  "surname": "Trois",
+  "role_name": "Player",
+  "team_name": "Team 3"
+}]

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>400</x>
+      <y>336</y>
+      <w>168</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>User
+--
+id: interger [PK]
+name: string
+surname: string
+auth0_id: string
+team_id: interger [FK] 
+role_id: interger [FK]
+
+bg=#AED6F1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>656</x>
+      <y>208</y>
+      <w>168</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>Team
+--
+id: interger [PK]
+name: string
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>400</x>
+      <y>200</y>
+      <w>168</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>Match
+--
+id: interger [PK]
+home_id: interger [FK]
+away_id: interger [FK]
+start_time: timestamp without timezone
+result: boolean
+score_home: integer
+score_away: integer
+
+bg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>104</x>
+      <y>280</y>
+      <w>208</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>MatchSelections 
+--
+match_id_id: integer [FK]
+user_id: integer [FK]
+confirmed: integer
+
+bg=green
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>656</x>
+      <y>408</y>
+      <w>168</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>Role
+--
+id: interger [PK]
+role: string
+
+bg=red</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>224</y>
+      <w>112</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=1..n</panel_attributes>
+    <additional_attributes>10.0;10.0;120.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>224</y>
+      <w>112</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=1..n</panel_attributes>
+    <additional_attributes>10.0;30.0;70.0;30.0;70.0;10.0;120.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>224</y>
+      <w>112</w>
+      <h>216</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=1..n</panel_attributes>
+    <additional_attributes>10.0;240.0;70.0;240.0;70.0;10.0;120.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>424</y>
+      <w>112</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=1..n</panel_attributes>
+    <additional_attributes>10.0;10.0;120.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>304</x>
+      <y>312</y>
+      <w>112</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=1..n</panel_attributes>
+    <additional_attributes>10.0;10.0;70.0;10.0;70.0;70.0;120.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>304</x>
+      <y>216</y>
+      <w>112</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+m1=1..n</panel_attributes>
+    <additional_attributes>10.0;110.0;70.0;110.0;70.0;10.0;120.0;10.0</additional_attributes>
+  </element>
+</diagram>

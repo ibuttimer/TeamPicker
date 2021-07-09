@@ -1,0 +1,49 @@
+{% extends 'main.html' %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+<div class="form-wrapper col-sm-12">
+    <h2 id="welcome_user">Welcome {{userinfo.name}}</h2>
+
+    {% if new_user %}
+    <!-- New user                    -->
+    {% include 'snippet/new_user_form.html' %}
+
+    {% elif new_team %}
+    <!-- New team                    -->
+    {% include 'snippet/new_team_form.html' %}
+
+    {% elif set_team %}
+    <!-- Set team                    -->
+    {% include 'snippet/set_team_form.html' %}
+
+    {% else %}
+    <h3 id="team_info">Team: {{userinfo.team}}&nbsp;&nbsp;
+        <span id="user_badge"
+          {% if userinfo.manager %}
+          class="badge bg-info text-dark">Manager
+          {% elif userinfo.player %}
+          class="badge bg-warning text-dark">Player
+          {% endif %}
+        </span>
+    </h3>
+    {% if last_login %}
+    <p>Last login: {{last_login}}</p>
+    {% endif %}
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+
+    {% endif %}
+
+</div>
+{% endblock %}
+

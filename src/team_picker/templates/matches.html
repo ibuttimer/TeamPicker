@@ -1,0 +1,29 @@
+{% extends 'main.html' %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+<div class="form-wrapper col-sm-12">
+
+    {% if match_new %}
+    <!-- New match -->
+    {% include 'snippet/new_match_form.html' %}
+
+    {% elif match_update %}
+    <!-- Update match -->
+    {% include 'snippet/new_match_form.html' %}
+
+    {% elif match_selections %}
+    <!-- Match selections -->
+    {% include 'snippet/selection_list.html' %}
+
+    {% elif match_search %}
+    <!-- Search match -->
+    {% include 'snippet/search_match_form.html' %}
+
+    {% else %}
+    <!-- List matches -->
+    {% include 'snippet/match_list.html' %}
+    {% endif %}
+
+</div>
+{% endblock %}
+

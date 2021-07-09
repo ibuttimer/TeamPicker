@@ -1,0 +1,88 @@
+<div>
+  {% if criteria %}
+  <div>
+    <h5>Search criteria:</h5>&nbsp;{{criteria}}
+  </div>
+  {% endif %}
+  <table class="table">
+    <thead>
+      <tr>
+        <!-- date | location | opposition -->
+        <th scope="col">
+          <i class="far fa-calendar-alt" title="Start time"
+             data-bs-toggle="tooltip" data-bs-placement="top"></i>
+        </th>
+        <th scope="col">
+          <i class="fas fa-map-marked-alt" title="Venue"
+             data-bs-toggle="tooltip" data-bs-placement="top"></i>
+        </th>
+        <th scope="col">
+          <i class="fas fa-users" title="Opposition"
+             data-bs-toggle="tooltip" data-bs-placement="top"></i>
+        </th>
+        <th scope="col">
+          <i class="fas fa-poll" title="Result"
+             data-bs-toggle="tooltip" data-bs-placement="top"></i>
+        </th>
+        <th scope="col">
+          <i class="fas fa-newspaper" title="Score"
+                           data-bs-toggle="tooltip" data-bs-placement="top"></i>
+        </th>
+        <th scope="col">&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for match in match_list %}
+      <tr>
+        <td id="start-time-{{loop.index0}}">{{match.start_time}}</td>
+        <td id="venue-{{loop.index0}}">{{match.venue}}</td>
+        <td id="opposition-{{loop.index0}}">{{match.opposition}}</td>
+        <td><i id="result-{{loop.index0}}" class="{{match.result}}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{match.result_tip}}"></i></td>
+        <td id="score-{{loop.index0}}"><span data-bs-toggle="tooltip" data-bs-placement="top" title="{{match.score_tip}}">{{match.score}}</span></td>
+        <!-- Edit/delete/selections -->
+        <td>
+          {% if role.manager %}
+          <a id="edit-match-{{loop.index0}}" class="btn btn-default btn-sm" href="{{ url_for('match_by_id_ui', match_id=match.id) }}">
+            <i class="fas fa-edit" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"></i>
+          </a>
+          &nbsp;
+          <button id="delete-match-{{loop.index0}}" type="button" class="btn btn-default btn-sm" data-bs-toggle="modal"
+                  data-bs-target="#confirm-delete" data-bs-del_href="{{url_for('delete_match_ui', match_id=match.id)}}"
+                  data-bs-success_href="{{url_for('matches_ui')}}"
+                  data-bs-start_time="{{match.start_time}}" data-bs-venue="{{match.venue}}"
+                  data-bs-opposition="{{match.opposition}}">
+            <i class="fas fa-trash-alt" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"></i>
+          </button>
+          &nbsp;
+          {% endif %}
+          <a id="match-selections-{{loop.index0}}" class="btn btn-default btn-sm" href="{{ url_for('match_selections', match_id=match.id) }}">
+            <i class="fas fa-user" data-bs-toggle="tooltip" data-bs-placement="top" title="Selections"></i>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+
+<!-- Confirm match delete modal -->
+<div class="modal fade" tabindex="-1" id="confirm-delete" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Confirm delete match</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-delete-msg"></p>
+        <a href="#" class="btn btn-danger btn-sm btn-block" role="button" title="Delete"
+           id="confirm-match-delete">Delete</a>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

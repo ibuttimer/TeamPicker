@@ -1,0 +1,22 @@
+[{
+  "username": "m1@team1.com",
+  "password": "Manager1!",
+  "firstname": "Manny",
+  "surname": "Uno",
+  "role_name": "Manager",
+  "team_name": "Team 1"
+}, {
+  "username": "m2@team2.com",
+  "password": "Manager2!",
+  "firstname": "Manfred",
+  "surname": "Dos",
+  "role_name": "Manager",
+  "team_name": "Team 2"
+}, {
+  "username": "m3@team3.com",
+  "password": "Manager3!",
+  "firstname": "Mildred",
+  "surname": "Tres",
+  "role_name": "Manager",
+  "team_name": "Team 3"
+}]

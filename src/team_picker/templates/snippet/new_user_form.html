@@ -1,0 +1,26 @@
+<form id="new_user_form" class="form" method="post" action="{{submit_action}}">
+  {{ form.hidden_tag() }}
+  <h3 class="form-heading">Create user</h3>
+
+  <label>Name</label>
+    <div class="form-group">
+      {{ form.name(class_ = 'form-control', placeholder='Name', autofocus = true) }}
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Surname</label>
+    <div class="form-group">
+      {{ form.surname(class_ = 'form-control', placeholder='Surname', autofocus = true) }}
+    </div>
+  </div>
+  <div class="form-group">
+    <label>Role</label>
+    <div class="form-group">
+      {{ form.role_id(class_ = 'form-control', placeholder='Role', autofocus = true) }}
+    </div>
+  </div>
+
+  {% include 'snippet/form_errors.html' %}
+
+  {% include 'snippet/submit_btn.html' %}
+</form>
