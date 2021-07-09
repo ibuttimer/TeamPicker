@@ -66,7 +66,13 @@ def setup_db(app: Flask, config: dict, init: bool = False):
     connection_uri = config[DB_URI] or \
         config[DB_URI_ENV_VAR] or \
         make_connection_uri(app, config)
-    
+
+    # SQLAlchemy 1.4.x has removed support for the postgres:// URI scheme,
+    # which is used by Heroku Postgres
+    # (https://github.com/sqlalchemy/sqlalchemy/issues/6083)
+    if connection_uri.startswith("postgres://"):
+        uri = connection_uri.replace("postgres://", "postgresql://", 1)
+
     app.config["SQLALCHEMY_DATABASE_URI"] = connection_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
