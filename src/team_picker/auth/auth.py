@@ -2,13 +2,13 @@ import json
 from enum import Enum
 from functools import wraps
 from http import HTTPStatus
-from typing import Any, Union
 from urllib.parse import urlencode
 from urllib.request import urlopen, Request
 
 from authlib.integrations.flask_client import OAuth
 from flask import request, Flask, url_for
 from jose import jwt
+from typing import Any, Union
 from werkzeug import Response
 from werkzeug.utils import redirect
 
@@ -26,20 +26,21 @@ from ..constants import \
      AUTH_MODE, Mode, DASHBOARD_URL, NEW_USER_QUERY,
      NON_INTERACTIVE_CLIENT_ID, NON_INTERACTIVE_CLIENT_SECRET,
      TEAM_PLAYER_ROLE_ID, TEAM_MANAGER_ROLE_ID, NEW_TEAM_QUERY, SET_TEAM_QUERY,
-     LOGIN_URL, YES_ARG
+     LOGIN_URL, YES_ARG, AUTH0_LOGGED_OUT_URL, BASE_URL
      )
 from ..models import (M_AUTH0_ID, M_ID, M_TEAM_ID, M_ROLE_ID, M_TEAM, M_NAME,
                       M_SURNAME, M_ROLE
                       )
 from ..services import (get_user_by_auth0_id, is_unassigned_team,
-                        is_manager_role, is_player_role, get_team_name,
-                        get_role_by_id, get_team_by_id
+                        is_manager_role, is_player_role, get_role_by_id,
+                        get_team_by_id
                         )
 from ..util import logger
 from ..util.HTTPHeader import HTTPHeader
 
 AUTH_CONFIG_KEYS = [AUTH0_DOMAIN, ALGORITHMS, AUTH0_CLIENT_ID,
-                    AUTH0_CLIENT_SECRET, AUTH0_CALLBACK_URL, AUTH0_AUDIENCE,
+                    AUTH0_CLIENT_SECRET, AUTH0_CALLBACK_URL,
+                    AUTH0_LOGGED_OUT_URL, AUTH0_AUDIENCE, BASE_URL,
                     NON_INTERACTIVE_CLIENT_ID, NON_INTERACTIVE_CLIENT_SECRET,
                     TEAM_PLAYER_ROLE_ID, TEAM_MANAGER_ROLE_ID
                     ]

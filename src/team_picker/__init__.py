@@ -86,7 +86,7 @@ def create_app(args: argparse.Namespace, test_config=None):
         if app_config_path is not None:
             # Load from an environment variable pointing to a configuration
             # file.
-            app.config.from_envvar(app_config_path, silent=True)
+            app.config.from_envvar(APP_CONFIG_PATH, silent=False)
             config_mapping = None
         else:
             # Load from environment variables.
