@@ -61,6 +61,8 @@ rem Client Secret from Application settings in Auth0.
 call heroku config:set AUTH0_CLIENT_SECRET=app_client_secret --app %APP_NAME%
 rem Allowed Callback URL from Application settings in Auth0.
 call heroku config:set AUTH0_CALLBACK_URL=http://your_app/callback --app %APP_NAME%
+rem Allowed Logout URL from Application settings in Auth0.
+call heroku config:set AUTH0_LOGGED_OUT_URL=http://your_app/ --app %APP_NAME%
 
 rem Client ID from Machine to Machine Application settings in Auth0.
 call heroku config:set NON_INTERACTIVE_CLIENT_ID=m2m_app_client_id --app %APP_NAME%
@@ -71,3 +73,11 @@ rem TeamManager Role ID from Auth0 roles
 call heroku config:set TEAM_PLAYER_ROLE_ID=rol_player_id --app %APP_NAME%
 rem TeamPlayer Role ID from Auth0 roles
 call heroku config:set TEAM_MANAGER_ROLE_ID=rol_manager_id --app %APP_NAME%
+
+rem Server-side session setting
+call heroku config:set SESSION_TYPE=sqlalchemy --app %APP_NAME%
+call heroku config:set PERMANENT_SESSION_LIFETIME=36000 --app %APP_NAME%
+
+rem Flask run settings
+call heroku config:set FLASK_APP=src.team_picker:create_app({}) --app %APP_NAME%
+call heroku config:set PYTHONPATH=/app/src --app %APP_NAME%

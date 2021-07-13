@@ -6,9 +6,16 @@ Following registration, a manager must create a team during setup.
 Subsequently, players may register and must select a team during setup. 
 Managers may then configure matches against other teams, and make their team selection from the list
 of players registered with their team. Following selection, players may confirm their availability. 
-Please see [Role functionality](#role-functionality) for additional details.
+Please see [Usage](#usage) for additional details.
 
 ## Getting Started
+
+### Reference Application
+A reference application is hosted on [Heroku](https://www.heroku.com) and may be accessed at https://teampicker-fswd.herokuapp.com/.
+
+See [Pre-configured users](#pre-configured-users) for a list of users that have already been set up.
+See [Additional users](#additional-users) for details on adding new users, 
+and [Usage](#usage) for details of application functionality.
 
 ### Application Layout
 The application structure is as follows:
@@ -17,6 +24,8 @@ The application structure is as follows:
 ├─ API.md               - API specification
 ├─ requirements.txt     - the dependencies to be installed, see Install dependencies
 ├─ teampicker.py        - main script
+├─ Procfile             - commands that are executed by the app on startup
+├─ runtime.txt          - python runtime version
 ├─ src                  - backend application code
 │  └─ team_picker       - application code 
 │     │  ├─ auth        - authentication code
@@ -64,6 +73,39 @@ Please see [Creating a virtual environment](https://packaging.python.org/guides/
 - [Bootstrap](https://getbootstrap.com/docs/5.0/getting-started/introduction/) framework. 
 - [jQuery](https://jquery.com/) JavaScript library. 
 
+
+##### Authorisation Dependencies
+The details of the authorisation configuration on [Auth0](https://auth0.com/) are as follows:
+
+###### TeamPicker Auth0 Application
+The main *TeamPicker* application on Auth0 is a [Regular web application](https://auth0.com/docs/applications).
+
+###### TeamPicker M2M Auth0 Application
+There is also a Machine to Machine application, *TeamPicker M2M*, which is authorised to request access tokens for the 
+[TeamPicker API](#teampicker-auth0-api) and the [Auth0 Management API](https://auth0.com/docs/api/management/v2), 
+by executing a client credentials exchange. *TeamPicker M2M* is used to assign roles to newly registered users. 
+
+###### TeamPicker Auth0 API
+The following are the details of the Auth0 API:
+
+| Permission | Description | TeamManager<br>Role | TeamPlayer<br>Role  |
+| ------------- | ------------- |:-----------:|:-----------:|
+| delete:match     | Delete a match       | &checkmark; | &cross; |
+| delete:own-user  | Delete personal user | &checkmark; | &checkmark; |
+| get:match	       | Get a match          | &checkmark; | &checkmark; |
+| get:own-user     | Read personal user   | &checkmark; | &checkmark; |
+| get:role	       | Read a role          | &checkmark; | &checkmark; |
+| get:team	       | Read a team          | &checkmark; | &checkmark; |
+| get:user	       | Read a user          | &checkmark; | &checkmark; |
+| patch:match	   | Update a match       | &checkmark; | &cross; |
+| patch:own-match  | Update personal info for match | &cross; | &checkmark; |
+| patch:own-user   | Update personal user | &checkmark; | &checkmark; |
+| patch:team	   | Update a team        | &checkmark; | &cross; |
+| patch:user	   | Update a user        | &cross; | &cross; |
+| post:match	   | Create a match       | &checkmark; | &cross; |
+| post:team	       | Create a team        | &checkmark; | &cross; |
+| post:user	       | Create a user        | &checkmark; | &cross; |
+
 #### Database schema
 The following database schema has been implemented:
 ![Database schema](doc/db_schema.jpg)
@@ -109,6 +151,8 @@ For example, to configure the application to use:
     ...
     ```
     Please see [sample.env](instance/sample.env) for additional information.
+    > **Note:** If variables are used in values, ensure they are surrounded with `{` and `}`, like `${VAR_TO_EXPAND}`, 
+    as bare variables such as `VAR_TO_EXPAND` are not expanded.
 
 ##### Configuration file
 * The configuration file should follow the format specified by [sample-config.py](instance/sample-config.py).
@@ -142,6 +186,7 @@ For example, to configure the application to use:
     ...
     ```
     Please see [sample-config.py](instance/sample-config.py) for additional information.
+    > **Note:** As the configuration file is a python script, standard python string formatting may be used. 
 
 1. Set the environment variables, `APP_CONFIG_PATH` and `INST_REL_CONFIG` appropriately.
 
