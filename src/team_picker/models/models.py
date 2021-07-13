@@ -137,7 +137,7 @@ class User(MultiDictMixin, db.Model):
                                (M_AUTH0_ID, str),
                                (M_ROLE_ID, int), (M_TEAM_ID, int)]:
             if name in attribs:
-                obj = entity[name] if name in entity.keys() else None
+                obj = entity.get(name, None)
                 _check_correct_type(obj, name, obj_type)
 
                 if obj_type == str:
@@ -201,7 +201,7 @@ class Team(MultiDictMixin, db.Model):
         valid_entity = {}
         for name, obj_type in [(M_NAME, str)]:
             if name in attribs:
-                obj = entity[name] if name in entity.keys() else None
+                obj = entity.get(name, None)
                 _check_correct_type(obj, name, obj_type)
 
                 if obj_type == str:
@@ -303,7 +303,7 @@ class Match(MultiDictMixin, db.Model):
         valid_entity = {}
         for name, obj_type in MATCH_VARS_AND_TYPES:
             if name in attribs:
-                obj = entity[name] if name in entity.keys() else None
+                obj = entity.get(name, None)
                 _check_correct_type(obj, name, obj_type)
 
                 if obj_type == int:

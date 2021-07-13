@@ -101,6 +101,7 @@ class BaseTestCase(unittest.TestCase):
         self.setup_mocks()
 
         """Define test variables and initialize app."""
+        base_url = 'http://localhost:5000/'
         self.app = create_app(
             args=parse_app_args(
                 f'--{INIT_DB_ARG_LONG}'.split()),
@@ -120,7 +121,9 @@ class BaseTestCase(unittest.TestCase):
                 AUTH0_AUDIENCE: 'dev',
                 AUTH0_CLIENT_ID: 'clientid',
                 AUTH0_CLIENT_SECRET: 'clientsecret',
-                AUTH0_CALLBACK_URL: 'http://localhost:5000/callback',
+                BASE_URL: base_url,
+                AUTH0_CALLBACK_URL: f'{base_url}callback',
+                AUTH0_LOGGED_OUT_URL: base_url,
                 NON_INTERACTIVE_CLIENT_ID: 'm2m_app_id',
                 NON_INTERACTIVE_CLIENT_SECRET: 'm2m_app_secret',
                 TEAM_PLAYER_ROLE_ID: 'auth0_player_role_id',

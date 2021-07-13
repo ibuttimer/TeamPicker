@@ -103,7 +103,7 @@ def create_app(args: argparse.Namespace, test_config=None):
                     if k == DB_URI_ENV_VAR and value is not None:
                         # Read value Database URL environment variable.
                         value = eval_environ_var_none(value)
-                elif k in [DB_PORT]:
+                elif k in [DB_PORT, PERMANENT_SESSION_LIFETIME]:
                     # Convert integer variables.
                     value = eval_environ_var_none(k)
                     value = int(value) if value is not None else None
@@ -124,8 +124,7 @@ def create_app(args: argparse.Namespace, test_config=None):
         app.config.from_mapping(config_mapping)
 
     set_logger(
-        app, app.config[LOG_LEVEL] if LOG_LEVEL in app.config.keys()
-        else DEFAULT_LOG_LEVEL)
+        app, app.config.get(LOG_LEVEL, DEFAULT_LOG_LEVEL))
 
     logger().debug(f"Configuration: {app.config}")
 
@@ -158,14 +157,14 @@ def create_app(args: argparse.Namespace, test_config=None):
         generate_api = os.path.join(instance_path, generate_api)
 
     # Setup database.
-    setup_db(app, {
+    db = setup_db(app, {
         k: v for k, v in app.config.items()
         if k.startswith(DB_CONFIG_VAR_PREFIX)
     }, init=init_db)
 
     # Setup authentication.
     # (Server-side sessions need to be disabled for Postman tests)
-    setup_auth(app, no_sessions=postman_test)
+    setup_auth(app, db, no_sessions=postman_test)
 
     # CORS(app)
     cors = CORS(app, resources={

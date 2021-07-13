@@ -7,6 +7,7 @@ from urllib.request import urlopen, Request
 
 from authlib.integrations.flask_client import OAuth
 from flask import request, Flask, url_for
+from flask_sqlalchemy import SQLAlchemy
 from jose import jwt
 from typing import Any, Union
 from werkzeug import Response
@@ -24,9 +25,8 @@ from ..constants import \
     (PROFILE_KEY, JWT_PAYLOAD, AUTH0_DOMAIN, ALGORITHMS,
      AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_CALLBACK_URL, AUTH0_AUDIENCE,
      AUTH_MODE, Mode, DASHBOARD_URL, NEW_USER_QUERY,
-     NON_INTERACTIVE_CLIENT_ID, NON_INTERACTIVE_CLIENT_SECRET,
-     TEAM_PLAYER_ROLE_ID, TEAM_MANAGER_ROLE_ID, NEW_TEAM_QUERY, SET_TEAM_QUERY,
-     LOGIN_URL, YES_ARG, AUTH0_LOGGED_OUT_URL, BASE_URL
+     NEW_TEAM_QUERY, SET_TEAM_QUERY,
+     LOGIN_URL, YES_ARG, AUTH_CONFIG_KEYS
      )
 from ..models import (M_AUTH0_ID, M_ID, M_TEAM_ID, M_ROLE_ID, M_TEAM, M_NAME,
                       M_SURNAME, M_ROLE
@@ -37,13 +37,6 @@ from ..services import (get_user_by_auth0_id, is_unassigned_team,
                         )
 from ..util import logger
 from ..util.HTTPHeader import HTTPHeader
-
-AUTH_CONFIG_KEYS = [AUTH0_DOMAIN, ALGORITHMS, AUTH0_CLIENT_ID,
-                    AUTH0_CLIENT_SECRET, AUTH0_CALLBACK_URL,
-                    AUTH0_LOGGED_OUT_URL, AUTH0_AUDIENCE, BASE_URL,
-                    NON_INTERACTIVE_CLIENT_ID, NON_INTERACTIVE_CLIENT_SECRET,
-                    TEAM_PLAYER_ROLE_ID, TEAM_MANAGER_ROLE_ID
-                    ]
 
 config = {k: "" if k != ALGORITHMS else [] for k in AUTH_CONFIG_KEYS}
 auth0 = None
@@ -79,10 +72,11 @@ and course material
 # TODO get user info in AUTH_HEADER mode
 
 
-def setup_auth(app: Flask, no_sessions: bool = False):
+def setup_auth(app: Flask, db: SQLAlchemy, no_sessions: bool = False):
     """
     Configure authentication.
     :param app: application
+    :param db: A Flask-SQLAlchemy instance.
     :param no_sessions: disable server-side sessions
     """
     global config
@@ -94,7 +88,7 @@ def setup_auth(app: Flask, no_sessions: bool = False):
     auth0_base_url = f'https://{config[AUTH0_DOMAIN]}'
     set_auth0_base_url(auth0_base_url)
 
-    setup_session(no_sessions=no_sessions)
+    setup_session(app, db, no_sessions=no_sessions)
 
     if AUTH_MODE == Mode.AUTHLIB:
         oauth = OAuth(app)

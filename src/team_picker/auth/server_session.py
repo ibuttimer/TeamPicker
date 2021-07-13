@@ -1,23 +1,45 @@
 from http import HTTPStatus
+
+from flask import session as server_session, Flask
+from flask_session import Session
+from flask_sqlalchemy import SQLAlchemy
 from typing import Any
 
-from flask import session as server_session
-
 from .exception import AuthError
-from ..constants import PROFILE_KEY, MANAGER_ROLE, PLAYER_ROLE
 from .misc import PROFILE_KEYS
+from ..constants import PROFILE_KEY, MANAGER_ROLE, PLAYER_ROLE, SESSION_TYPE, \
+    FILESYSTEM_SESSION_TYPE, SQLALCHEMY_SESSION_TYPE, SESSION_TYPES
 from ..util import logger
 
 session = {}    # Default, server-side sessions disabled.
 
 
-def setup_session(no_sessions: bool = False):
+def setup_session(app: Flask, db: SQLAlchemy, no_sessions: bool = False):
     """
     Initialise server-side session management.
+    :param app: application
+    :param db: A Flask-SQLAlchemy instance.
     :param no_sessions: disable server-side sessions
     """
     global session
     if not no_sessions:
+
+        app.config["SESSION_PERMANENT"] = True
+
+        if SESSION_TYPE not in app.config.keys():
+            app.config[SESSION_TYPE] = FILESYSTEM_SESSION_TYPE
+        for key in SESSION_TYPES:
+            setting = app.config[SESSION_TYPE].lower()
+            if setting == key:
+                app.config[SESSION_TYPE] = setting
+                if setting == SQLALCHEMY_SESSION_TYPE:
+                    app.config["SESSION_SQLALCHEMY"] = db
+                break
+        else:
+            raise ValueError(f"{SESSION_TYPE} configuration not found")
+
+        Session(app)
+
         session = server_session    # Enable server-side sessions
     else:
         logger().info("Server-side sessions disabled.")

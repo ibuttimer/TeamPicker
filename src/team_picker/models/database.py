@@ -4,6 +4,7 @@ import urllib.parse
 
 from flask import Flask
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 from .JsonDeEncoder import JsonEncoder, JsonDecoder
 from .db_session import db
@@ -50,7 +51,7 @@ def make_connection_uri(app: Flask, config: dict) -> str:
     return uri
 
 
-def setup_db(app: Flask, config: dict, init: bool = False):
+def setup_db(app: Flask, config: dict, init: bool = False) -> SQLAlchemy:
     """
     Initialise the app for the database, binding a flask application and a
     SQLAlchemy service. Additionally sets custom JSON encoder and decoder for
@@ -58,14 +59,14 @@ def setup_db(app: Flask, config: dict, init: bool = False):
     :param app:      Flask application
     :param config:   database configuration
     :param init:     initialise database
+    :return Flask-SQLAlchemy instance.
     """
     # Database URI precedence is:
     # 1. DB_URI
     # 2. DB_URI_ENV_VAR
     # 3. make uri from DB_DIALECT etc.
-    connection_uri = config[DB_URI] or \
-        config[DB_URI_ENV_VAR] or \
-        make_connection_uri(app, config)
+    connection_uri = config.get(DB_URI, None) or \
+        config.get(DB_URI_ENV_VAR, None) or make_connection_uri(app, config)
 
     # SQLAlchemy 1.4.x has removed support for the postgres:// URI scheme,
     # which is used by Heroku Postgres
@@ -91,6 +92,8 @@ def setup_db(app: Flask, config: dict, init: bool = False):
 
     if init:
         db_drop_and_create_all()
+
+    return db
 
 
 def db_drop_and_create_all():
