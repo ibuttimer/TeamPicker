@@ -26,13 +26,12 @@ def setup_session(app: Flask, db: SQLAlchemy, no_sessions: bool = False):
 
         app.config["SESSION_PERMANENT"] = True
 
-        if SESSION_TYPE not in app.config.keys():
+        if not app.config.get(SESSION_TYPE, None):
             app.config[SESSION_TYPE] = FILESYSTEM_SESSION_TYPE
         for key in SESSION_TYPES:
-            setting = app.config[SESSION_TYPE].lower()
-            if setting == key:
-                app.config[SESSION_TYPE] = setting
-                if setting == SQLALCHEMY_SESSION_TYPE:
+            if app.config[SESSION_TYPE].lower() == key:
+                app.config[SESSION_TYPE] = key
+                if key == SQLALCHEMY_SESSION_TYPE:
                     app.config["SESSION_SQLALCHEMY"] = db
                 break
         else:
