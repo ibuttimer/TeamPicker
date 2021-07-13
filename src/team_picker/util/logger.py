@@ -8,12 +8,24 @@ DEFAULT_LOG_LEVEL = 'INFO'
 
 
 def set_logger(app: Flask, level: Union[int, str] = DEFAULT_LOG_LEVEL):
+    """
+    Set the application logger
+    :param app: Flask app
+    :param level: one of 'CRITICAL', 'FATAL', 'ERROR', 'WARN', 'WARNING',
+                  'INFO' or 'DEBUG'
+    """
     global _APP
     _APP = app
     set_level(level)
 
 
-def logger() -> logging.Logger:
+def logger(app: Flask = None) -> logging.Logger:
+    """
+    Get application logger.
+    :return:
+    """
+    if _APP is None and app is not None:
+        set_logger(app)
     return _APP.logger
 
 

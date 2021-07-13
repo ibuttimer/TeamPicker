@@ -1,15 +1,20 @@
-import argparse
-import os
 import json
-import sys
+import os
 from http import HTTPStatus
-from typing import Any, Union
 
+import argparse
+from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
+from typing import Any, Union
 
-from dotenv import load_dotenv
-
+from team_picker.models import setup_db
+from team_picker.models.exception import ModelError
+from team_picker.util import (eval_environ_var_truthy, http_error_result,
+                              set_logger, print_exc_info, logger,
+                              eval_environ_var_none, DEFAULT_LOG_LEVEL
+                              )
+from team_picker.util.exception import AbortError
 from .auth import (setup_auth, callback_handling, login, logout,
                    is_logged_in, get_profile_role, get_profile,
                    get_profile_setup_complete
@@ -31,13 +36,6 @@ from .controllers import (all_roles, get_role_by_id,
                           match_user_selection, match_user_confirm,
                           home, dashboard, token_login
                           )
-from team_picker.models import setup_db
-from team_picker.models.exception import ModelError
-from team_picker.util import (eval_environ_var_truthy, http_error_result,
-                              set_logger, print_exc_info, logger,
-                              eval_environ_var_none, DEFAULT_LOG_LEVEL
-                              )
-from team_picker.util.exception import AbortError
 
 INIT_DB_ARG_LONG = "initdb"
 INIT_DB_ARG_SHORT = "idb"
