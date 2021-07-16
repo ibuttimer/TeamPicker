@@ -158,8 +158,8 @@ def create_app(args: argparse.Namespace, test_config=None):
 
     if cmd_line_args[GENERATE_API_ARG]:
         # Make path to instance folder
-        generate_api = os.path.join(instance_path,
-                                    cmd_line_args[GENERATE_API_ARG])
+        cmd_line_args[GENERATE_API_ARG] = \
+            os.path.join(instance_path, cmd_line_args[GENERATE_API_ARG])
 
     # Setup database.
     db = setup_db(app, {
@@ -292,17 +292,19 @@ def create_app(args: argparse.Namespace, test_config=None):
         ("Delete match", "Endpoint to handle requests to DELETE match by id.",
          MATCH_BY_ID_URL, delete_match_api, [DELETE]),
     ]:
-        add_url_rule(app, endpoint_info, generate_api=generate_api,
+        add_url_rule(app, endpoint_info,
+                     generate_api=cmd_line_args[GENERATE_API_ARG],
                      new_file=new_file)
         new_file = False
 
-    if postman_test:
+    if cmd_line_args[POSTMAN_TEST_ARG]:
         add_url_rule(app,
                      ("Login (token)",
                       "Endpoint to handle login requests using an access "
                       "token (only for Postman testing).",
                       TOKEN_LOGIN_URL, token_login, [POST]),
-                     generate_api=generate_api, new_file=new_file)
+                     generate_api=cmd_line_args[GENERATE_API_ARG],
+                     new_file=new_file)
 
     # Error handlers
     @app.errorhandler(HTTPStatus.BAD_REQUEST)

@@ -2,6 +2,14 @@ set APP_NAME=your-heroku-app-name
 
 call heroku config:set INST_REL_CONFIG=True --app %APP_NAME%
 
+rem Environment variable equivalents of command line arguments.
+rem If set to True, initialise the database on boot
+rem call heroku config:set INIT_DB_ARG=True --app %APP_NAME%
+rem If set to True, disable server-side sessions
+rem call heroku config:set POSTMAN_TEST_ARG=True --app %APP_NAME%
+rem If set, generate API documentation
+rem call heroku config:set GENERATE_API_ARG=api.md --app %APP_NAME%
+
 rem Log level can be one of 'CRITICAL', 'FATAL', 'ERROR', 'WARN', 'WARNING', 'INFO' or 'DEBUG'
 call heroku config:set LOG_LEVEL=DEBUG --app %APP_NAME%
 
