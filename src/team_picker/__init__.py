@@ -91,11 +91,12 @@ def create_app(args: argparse.Namespace, test_config=None):
             def convert_env_var(k):
                 value = os.environ.get(k)
                 if k in [DEBUG, TESTING, DB_INSTANCE_RELATIVE_CONFIG,
-                         'SQLALCHEMY_TRACK_MODIFICATIONS']:
+                         'SQLALCHEMY_TRACK_MODIFICATIONS',
+                         INIT_DB_ARG, POSTMAN_TEST_ARG]:
                     # Convert boolean variables.
                     value = eval_environ_var_truthy(k)
                 elif k in [DB_URI, DB_URI_ENV_VAR, DB_DRIVER, DB_USERNAME,
-                           DB_PASSWORD, DB_HOST]:
+                           DB_PASSWORD, DB_HOST, GENERATE_API_ARG]:
                     # Convert str or None variables.
                     value = eval_environ_var_none(k)
                     if k == DB_URI_ENV_VAR and value is not None:
@@ -126,43 +127,49 @@ def create_app(args: argparse.Namespace, test_config=None):
 
     logger().debug(f"Configuration: {app.config}")
 
-    init_db = False
-    postman_test = False
-    generate_api = False
+    # Process command line arguments.
+    cmd_line_args = {k: False for k in CMD_LINE_ARGS}
     if isinstance(args, argparse.Namespace):
         # If script run using
         # "python src\team_picker\__init__.py --initdb --postman_test
         #  --generate_api api.md"
-        init_db = args.initdb
-        postman_test = args.postman_test
-        generate_api = args.generate_api
+        cmd_line_args[INIT_DB_ARG] = args.initdb
+        cmd_line_args[POSTMAN_TEST_ARG] = args.postman_test
+        cmd_line_args[GENERATE_API_ARG] = args.generate_api
     elif isinstance(args, dict):
         # If run using
         # "set FLASK_APP=src.team_picker:create_app({
         #   "initdb":True, "postman_test:True, "generate_api":api.md
         #   })"
-        init_db = process_dict_arg([INIT_DB_ARG_LONG, INIT_DB_ARG_SHORT], args,
-                                   dflt_val=init_db)
-        postman_test = process_dict_arg(
-            [POSTMAN_TEST_ARG_LONG, POSTMAN_TEST_ARG_SHORT], args,
-            dflt_val=postman_test)
-        generate_api = process_dict_arg(
-            [GENERATE_API_ARG_LONG, GENERATE_API_ARG_SHORT], args,
-            dflt_val=generate_api)
+        for k, arg_list in [
+            (INIT_DB_ARG, [INIT_DB_ARG_LONG, INIT_DB_ARG_SHORT]),
+            (POSTMAN_TEST_ARG, [POSTMAN_TEST_ARG_LONG, POSTMAN_TEST_ARG_SHORT]),
+            (GENERATE_API_ARG, [GENERATE_API_ARG_LONG, GENERATE_API_ARG_SHORT]),
+        ]:
+            cmd_line_args[k] = process_dict_arg(arg_list, args,
+                                                dflt_val=cmd_line_args[k])
 
-    if generate_api:
+    # Environment variables have precedence over command line arguments.
+    for k in CMD_LINE_ARGS:
+        if k in os.environ:
+            cmd_line_args[k] = config_mapping.get(k, cmd_line_args[k])
+
+    logger().debug(f"Command line: {cmd_line_args}")
+
+    if cmd_line_args[GENERATE_API_ARG]:
         # Make path to instance folder
-        generate_api = os.path.join(instance_path, generate_api)
+        generate_api = os.path.join(instance_path,
+                                    cmd_line_args[GENERATE_API_ARG])
 
     # Setup database.
     db = setup_db(app, {
         k: v for k, v in app.config.items()
         if k.startswith(DB_CONFIG_VAR_PREFIX)
-    }, init=init_db)
+    }, init=cmd_line_args[INIT_DB_ARG])
 
     # Setup authentication.
     # (Server-side sessions need to be disabled for Postman tests)
-    setup_auth(app, db, no_sessions=postman_test)
+    setup_auth(app, db, no_sessions=cmd_line_args[POSTMAN_TEST_ARG])
 
     # CORS(app)
     cors = CORS(app, resources={

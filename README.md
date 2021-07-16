@@ -154,6 +154,8 @@ For example, to configure the application to use:
     > **Note:** If variables are used in values, ensure they are surrounded with `{` and `}`, like `${VAR_TO_EXPAND}`, 
     as bare variables such as `VAR_TO_EXPAND` are not expanded.
 
+    > **Note:** If a variable is defined in both `.env` and as a system environment variable, the system environment variable has precedence.  
+
 ##### Configuration file
 * The configuration file should follow the format specified by [sample-config.py](instance/sample-config.py).
 * The environment variables determine which configuration file to load.
@@ -234,6 +236,10 @@ optional arguments:
                         Generate API Markdown documentation, as specified file
 ```
 Depending on the run method, these arguments must be passed as commandline arguments ([Run using script](#run-using-script)), or as a dictionary ([Run using Flask](#run-using-flask)).
+
+> **Note:** Environment variable equivalents of command line arguments have precedence over command line arguments.
+
+> **Note:** The API Markdown documentation file will be generated in the [instance](instance) folder.
 
 ##### Initialise the database (--initdb)
 When specified the database will be initialised before use, resulting on the removal of all data.

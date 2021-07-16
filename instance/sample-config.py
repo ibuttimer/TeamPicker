@@ -1,0 +1,92 @@
+import os
+
+# Environment variable equivalents of command line arguments.
+# If set to True, initialise the database on boot
+INIT_DB_ARG = False
+# If set to True, disable server-side sessions
+POSTMAN_TEST_ARG = False
+# If set, generate API documentation
+GENERATE_API_ARG = None
+
+# Log level can be one of 'CRITICAL', 'FATAL', 'ERROR', 'WARN', 'WARNING',
+# 'INFO' or 'DEBUG'
+LOG_LEVEL = 'DEBUG'
+
+SECRET_KEY = '<app secret key>'
+# Grabs the folder where the script runs.
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+DEBUG = True         # Debug mode; True or False.
+TESTING = False      # Testing mode; True or False.
+
+# Database URI, if specified (i.e. not None) it is used, otherwise the
+# DB_URI_ENV_VAR or DB_DIALECT etc. variables are used to construct the
+# Database URL
+DB_URI = None
+
+# Database URI environment variable, if specified (i.e. not None) it is used,
+# otherwise the DB_URI or DB_DIALECT etc. variables are used to construct the
+# Database URL
+DB_URI_ENV_VAR = None
+
+# https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#connection-uri-format
+# See https://docs.sqlalchemy.org/en/14/core/engines.html#supported-databases.
+DB_DIALECT = '<database dialect>'
+DB_DRIVER = None         # Use default driver.
+DB_USERNAME = '<database username>'
+DB_PASSWORD = '<database password>'
+DB_HOST = '<database host>'
+DB_PORT = 0000
+DB_DATABASE = '<database name>'
+
+# SQLite specific, if true, database file path will be generated relative to
+# app instance folder, otherwise database file path should be absolute.
+DB_INSTANCE_RELATIVE_CONFIG = True
+
+# Example SQLite database settings:
+# Absolute path:
+#   Unix/Mac:   {'DB_DATABASE': '/absolute/path/to/foo.db',
+#                'DB_INSTANCE_RELATIVE_CONFIG': False}
+#   Windows:    {'DB_DATABASE': 'C:\\absolute\\path\\to\\foo.db',
+#                'DB_INSTANCE_RELATIVE_CONFIG': False}
+# App instance folder:
+#   Unix/Mac:   {'DB_DATABASE': 'foo.db', 'DB_INSTANCE_RELATIVE_CONFIG': True}
+#   Windows:    {'DB_DATABASE': 'foo.db', 'DB_INSTANCE_RELATIVE_CONFIG': True}
+
+
+SQLALCHEMY_TRACK_MODIFICATIONS = False  # disable FSADeprecationWarning
+
+
+# Auth0 authentication related settings:
+# Domain from Application settings in Auth0.
+AUTH0_DOMAIN = '<auth0 domain>'
+# Signing Algorithm from API settings in Auth0.
+ALGORITHMS = ['RS256']
+# Identifier from API settings in Auth0.
+AUTH0_AUDIENCE = '<auth0 identifier>'
+
+# Client ID from Application settings in Auth0.
+AUTH0_CLIENT_ID = '<auth0 client id>'
+# Client Secret from Application settings in Auth0.
+AUTH0_CLIENT_SECRET = '<auth0 client secret>'
+# Application base URL
+BASE_URL = 'http://localhost:5000/'
+# Allowed Callback URL from Application settings in Auth0.
+AUTH0_CALLBACK_URL = f'{BASE_URL}callback'
+# Allowed Logout URL from Application settings in Auth0.
+AUTH0_LOGGED_OUT_URL = f'{BASE_URL}'
+
+# Client ID from Machine to Machine Application settings in Auth0.
+NON_INTERACTIVE_CLIENT_ID = '<auth0 m2m client id>'
+# Client Secret from Machine to Machine Application settings in Auth0.
+NON_INTERACTIVE_CLIENT_SECRET = '<auth0 m2m client secret>'
+
+# TeamManager Role ID from Auth0 roles
+TEAM_MANAGER_ROLE_ID = '<manager role id>'
+# TeamPlayer Role ID from Auth0 roles
+TEAM_PLAYER_ROLE_ID = '<player role id>'
+
+# Server-side session type; one of "filesystem" or "sqlalchemy"
+SESSION_TYPE = 'filesystem'
+# The lifetime of a permanent session, an integer representing seconds.
+PERMANENT_SESSION_LIFETIME = 36000
