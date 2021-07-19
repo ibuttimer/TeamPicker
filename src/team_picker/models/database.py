@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 import urllib.parse
 
 from flask import Flask
@@ -11,6 +12,28 @@ from .db_session import db
 from .models import add_pre_configured
 from ..constants import *
 from ..util import logger, is_enabled_for, fmt_log
+
+# Reentrant lock to prevent worker threads interfering with each other during
+# boot, e.g. when database initialisation option specified.
+_lock = threading.RLock()
+
+
+def _acquire_lock():
+    """
+    Acquire the module-level lock for serializing access to shared data.
+
+    This should be released with _release_lock().
+    """
+    if _lock:
+        _lock.acquire()
+
+
+def _release_lock():
+    """
+    Release the module-level lock acquired by calling _acquire_lock().
+    """
+    if _lock:
+        _lock.release()
 
 
 def make_connection_uri(app: Flask, config: dict) -> str:
@@ -77,6 +100,10 @@ def setup_db(app: Flask, config: dict, init: bool = False) -> SQLAlchemy:
 
     app.config["SQLALCHEMY_DATABASE_URI"] = connection_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    # Acquire lock during initialisation.
+    _acquire_lock()
+
     db.app = app
     db.init_app(app)
 
@@ -92,6 +119,9 @@ def setup_db(app: Flask, config: dict, init: bool = False) -> SQLAlchemy:
 
     if init:
         db_drop_and_create_all()
+
+    # Finished initialisation, release lock.
+    _release_lock()
 
     return db
 

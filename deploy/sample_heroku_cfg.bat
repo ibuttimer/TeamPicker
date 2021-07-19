@@ -13,7 +13,7 @@ rem call heroku config:set GENERATE_API_ARG=api.md --app %APP_NAME%
 rem Log level can be one of 'CRITICAL', 'FATAL', 'ERROR', 'WARN', 'WARNING', 'INFO' or 'DEBUG'
 call heroku config:set LOG_LEVEL=DEBUG --app %APP_NAME%
 
-call heroku config:set SECRET_KEY="`< /dev/urandom tr -dc 'a-zA-Z0-9' | head -c16`" --app %APP_NAME%
+call heroku config:set SECRET_KEY="< /dev/urandom tr -dc 'a-zA-Z0-9' | head -c16" --app %APP_NAME%
 call heroku config:set DEBUG=True --app %APP_NAME%
 call heroku config:set TESTING=False --app %APP_NAME%
 
