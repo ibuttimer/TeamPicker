@@ -10,7 +10,7 @@ from .JsonDeEncoder import JsonEncoder, JsonDecoder
 from .db_session import db
 from .models import add_pre_configured
 from ..constants import *
-from ..util import logger, is_enabled_for
+from ..util import logger, is_enabled_for, fmt_log
 
 
 def make_connection_uri(app: Flask, config: dict) -> str:
@@ -84,9 +84,9 @@ def setup_db(app: Flask, config: dict, init: bool = False) -> SQLAlchemy:
     app.json_decoder = JsonDecoder
 
     if is_enabled_for(logging.DEBUG):
-        logger().debug(f"Initialised database: {connection_uri}")
+        logger().debug(fmt_log(f"Initialised database: {connection_uri}"))
     else:
-        logger().info(f"Initialised database")
+        logger().info(fmt_log(f"Initialised database"))
 
     migrate = Migrate(app, db)
 
@@ -106,5 +106,5 @@ def db_drop_and_create_all():
     # pre-populate roles & teams
     add_pre_configured()
 
-    logger().info(f"Database tables recreated")
+    logger().info(fmt_log(f"Database tables recreated"))
 

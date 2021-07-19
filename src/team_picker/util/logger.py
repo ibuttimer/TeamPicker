@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import Union
 
 from flask import Flask
@@ -46,3 +47,9 @@ def is_enabled_for(level: int) -> bool:
     """
     return logger().isEnabledFor(level)
 
+
+def fmt_log(msg: str):
+    """
+    Add process id to message
+    """
+    return f"[{os.getpid()}] {msg}"

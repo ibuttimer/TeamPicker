@@ -9,7 +9,7 @@ from .exception import AuthError
 from .misc import PROFILE_KEYS
 from ..constants import PROFILE_KEY, MANAGER_ROLE, PLAYER_ROLE, SESSION_TYPE, \
     FILESYSTEM_SESSION_TYPE, SQLALCHEMY_SESSION_TYPE, SESSION_TYPES
-from ..util import logger
+from ..util import logger, fmt_log
 
 session = {}    # Default, server-side sessions disabled.
 
@@ -41,7 +41,7 @@ def setup_session(app: Flask, db: SQLAlchemy, no_sessions: bool = False):
 
         session = server_session    # Enable server-side sessions
     else:
-        logger().info("Server-side sessions disabled.")
+        logger().info(fmt_log("Server-side sessions disabled."))
 
 
 def profile_in_session():

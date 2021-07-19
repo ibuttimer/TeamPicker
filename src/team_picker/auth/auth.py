@@ -35,7 +35,7 @@ from ..services import (get_user_by_auth0_id, is_unassigned_team,
                         is_manager_role, is_player_role, get_role_by_id,
                         get_team_by_id
                         )
-from ..util import logger
+from ..util import logger, fmt_log
 from ..util.HTTPHeader import HTTPHeader
 
 config = {k: "" if k != ALGORITHMS else [] for k in AUTH_CONFIG_KEYS}
@@ -556,7 +556,7 @@ def check_permission(permission: str, payload: dict,
                 msg = f"{msg} or role {role_permissions}"
 
         if raise_error:
-            logger().warning(msg)
+            logger().warning(fmt_log(msg))
             raise AuthError.auth_error(HTTPStatus.UNAUTHORIZED, 'unauthorized',
                                        'Permission not found.')
     return True
@@ -614,7 +614,7 @@ def check_permissions(permissions: list[str], payload: dict,
                 msg = f"{msg} or role {role_permissions}"
 
     if not ok:
-        logger().warning(msg)
+        logger().warning(fmt_log(msg))
         raise AuthError.auth_error(HTTPStatus.UNAUTHORIZED, 'unauthorized',
                                    'Permission not found.')
     return True

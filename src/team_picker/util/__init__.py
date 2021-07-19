@@ -5,7 +5,7 @@ from .misc import (success_result, error_result, http_error_result,
                    )
 from .HTTPHeader import HTTPHeader
 from .logger import (set_logger, logger, set_level, DEFAULT_LOG_LEVEL,
-                     is_enabled_for
+                     is_enabled_for, fmt_log
                      )
 
 from team_picker.util.forms_misc import *
@@ -27,6 +27,7 @@ __all__ = [
     'set_level',
     'DEFAULT_LOG_LEVEL',
     'is_enabled_for',
+    'fmt_log',
 
     "NO_OPTION_SELECTED",
     "HOME_VENUE",

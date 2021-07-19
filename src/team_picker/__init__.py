@@ -33,7 +33,7 @@ from .models import setup_db
 from .models.exception import ModelError
 from .util import (eval_environ_var_truthy, http_error_result,
                    set_logger, print_exc_info, logger,
-                   eval_environ_var_none, DEFAULT_LOG_LEVEL
+                   eval_environ_var_none, DEFAULT_LOG_LEVEL, fmt_log
                    )
 from .util.exception import AbortError
 
@@ -125,7 +125,7 @@ def create_app(args: argparse.Namespace, test_config=None):
     set_logger(
         app, app.config.get(LOG_LEVEL, DEFAULT_LOG_LEVEL))
 
-    logger().debug(f"Configuration: {app.config}")
+    logger().debug(fmt_log(f"Configuration: {app.config}"))
 
     # Process command line arguments.
     cmd_line_args = {k: False for k in CMD_LINE_ARGS}
@@ -154,7 +154,7 @@ def create_app(args: argparse.Namespace, test_config=None):
         if k in os.environ:
             cmd_line_args[k] = config_mapping.get(k, cmd_line_args[k])
 
-    logger().debug(f"Command line: {cmd_line_args}")
+    logger().debug(fmt_log(f"Command line: {cmd_line_args}"))
 
     if cmd_line_args[GENERATE_API_ARG]:
         # Make path to instance folder
@@ -388,8 +388,8 @@ def add_url_rule(app, endpoint_info, generate_api: Union[bool, str] = False,
 
     if generate_api:
         if new_file:
-            logger().info(f'Generating API documentation template at '
-                          f'{generate_api}')
+            logger().info(fmt_log(f'Generating API documentation template at '
+                          f'{generate_api}'))
             mode = "w"
         else:
             mode = "a"
