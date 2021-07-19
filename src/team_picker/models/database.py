@@ -25,7 +25,9 @@ def _acquire_lock():
     This should be released with _release_lock().
     """
     if _lock:
+        logger().debug(fmt_log(f"acquire_lock"))
         _lock.acquire()
+        logger().debug(fmt_log(f"acquired"))
 
 
 def _release_lock():
@@ -33,7 +35,9 @@ def _release_lock():
     Release the module-level lock acquired by calling _acquire_lock().
     """
     if _lock:
+        logger().debug(fmt_log(f"release_lock"))
         _lock.release()
+        logger().debug(fmt_log(f"released"))
 
 
 def make_connection_uri(app: Flask, config: dict) -> str:
