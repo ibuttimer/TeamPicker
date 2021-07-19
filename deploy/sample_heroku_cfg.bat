@@ -5,9 +5,15 @@ call heroku config:set INST_REL_CONFIG=True --app %APP_NAME%
 rem Environment variable equivalents of command line arguments.
 rem If set to True, initialise the database on boot
 rem call heroku config:set INIT_DB_ARG=True --app %APP_NAME%
-rem If set to True, disable server-side sessions
+rem As gunicorn has no inter-worker method of communication to coordinate the database initialisation,
+rem there must have only one worker, i.e. set WEB_CONCURRENCY as Gunicorn uses it as it's default value
+rem https://docs.gunicorn.org/en/stable/settings.html#workers
+rem call heroku config:set WEB_CONCURRENCY=1 --app %APP_NAME%
+
+rem If set to True, disable server-side sessions (should not be used on Heroku)
 rem call heroku config:set POSTMAN_TEST_ARG=True --app %APP_NAME%
-rem If set, generate API documentation
+
+rem If set, generate API documentation (should not be used on Heroku)
 rem call heroku config:set GENERATE_API_ARG=api.md --app %APP_NAME%
 
 rem Log level can be one of 'CRITICAL', 'FATAL', 'ERROR', 'WARN', 'WARNING', 'INFO' or 'DEBUG'

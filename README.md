@@ -239,19 +239,32 @@ Depending on the run method, these arguments must be passed as commandline argum
 
 > **Note:** Environment variable equivalents of command line arguments have precedence over command line arguments.
 
-> **Note:** The API Markdown documentation file will be generated in the [instance](instance) folder.
-
 ##### Initialise the database (--initdb)
 When specified the database will be initialised before use, resulting on the removal of all data.
+
+The environment variable equivalent is `INIT_DB_ARG`.
+
 > **Note:** This operation should not be confused with [Database Migration](#database-migration) which updates
 > the database schema.
+
+> **Note:** As [Gunicorn](https://gunicorn.org/) has no inter-worker method of communication to coordinate the database initialisation,
+there must be only one worker when initialising the database. [Gunicorn](https://gunicorn.org/) uses the `WEB_CONCURRENCY` environment variable as 
+the [default value for the number of workers](https://docs.gunicorn.org/en/stable/settings.html#workers). 
+If not set, Heroku provides a `WEB_CONCURRENCY` value [depending on the dyno size](https://devcenter.heroku.com/articles/optimizing-dyno-usage#python).  
+Therefore, the `WEB_CONCURRENCY` environment variable should be set to `1` when utilising `--initdb` or `INIT_DB_ARG` on Heroku.  
 
 ##### Disable server-side sessions (--postman_test)
 When specified, server-side sessions will be disabled. This setting is necessary when running Postman requests and 
 using a JWT from a user logged-in on a browser in the Postman application.  
 
+The environment variable equivalent is `POSTMAN_TEST_ARG`, however it should not be used on Heroku.
+
 ##### Generate API markdown (--generate_api)
 When specified, an API template Markdown document detailing all the application routes will be generated using the specified filename.    
+
+The environment variable equivalent is `GENERATE_API_ARG`, however it should not be used on Heroku.
+
+> **Note:** The API Markdown documentation file will be generated in the [instance](instance) folder.
 
 #### Database Migration
 Once the application is configured for a blank database, as specified in [Application Configuration](#application-configuration), 
