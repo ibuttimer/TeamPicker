@@ -60,7 +60,7 @@ Please see [Creating a virtual environment](https://packaging.python.org/guides/
 
 ##### Terminal Window
 
->**Note:** The following instructions are intended to be executed from a terminal window in the project root folder,
+>The following instructions are intended to be executed from a terminal window in the project root folder,
 > in which the [virtual environment is activated](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment).
 
 ##### Key Dependencies
@@ -151,10 +151,10 @@ For example, to configure the application to use:
     ...
     ```
     Please see [sample.env](instance/sample.env) for additional information.
-    > **Note:** If variables are used in values, ensure they are surrounded with `{` and `}`, like `${VAR_TO_EXPAND}`, 
+    > If variables are used in values, ensure they are surrounded with `{` and `}`, like `${VAR_TO_EXPAND}`, 
     as bare variables such as `VAR_TO_EXPAND` are not expanded.
 
-    > **Note:** If a variable is defined in both `.env` and as a system environment variable, the system environment variable has precedence.  
+    > If a variable is defined in both `.env` and as a system environment variable, the system environment variable has precedence.  
 
 ##### Configuration file
 * The configuration file should follow the format specified by [sample-config.py](instance/sample-config.py).
@@ -168,6 +168,8 @@ For example, to configure the application to use:
     Flag indicating if [instance_relative_config](https://flask.palletsprojects.com/en/2.0.x/api/?highlight=instance_relative_config) is relative to the [instance folder](https://flask.palletsprojects.com/en/2.0.x/config/#instance-folders).
     A setting of `f`, `false`, `n`, `no` or `0` is evaluated as *False*, otherwise the setting will be evaluated according to
     it's [truthy](https://docs.python.org/3/library/stdtypes.html#truth) value.
+
+> Ensure there is no `.env` file in the project root folder or any parent folders, otherwise an unexpected configuration may result.
 
 For example, to configure the application to use:
 * a configuration file `config.py` located in the [instance](instance) folder, and
@@ -188,7 +190,7 @@ For example, to configure the application to use:
     ...
     ```
     Please see [sample-config.py](instance/sample-config.py) for additional information.
-    > **Note:** As the configuration file is a python script, standard python string formatting may be used. 
+    > As the configuration file is a python script, standard python string formatting may be used. 
 
 1. Set the environment variables, `APP_CONFIG_PATH` and `INST_REL_CONFIG` appropriately.
 
@@ -217,7 +219,6 @@ For example, to configure the application to use:
     $ export AUTH0_AUDIENCE=dev                   > set AUTH0_AUDIENCE=dev
     ...
     ```
-> **Note:**<br>
 > For convenience, the location of the [instance folder](https://flask.palletsprojects.com/en/2.0.x/config/#instance-folders)
 > has been hardcoded to [instance](instance), as the default location determined by Flask
 > varies depending on whether the application or test scripts are running. Please see
@@ -237,17 +238,17 @@ optional arguments:
 ```
 Depending on the run method, these arguments must be passed as commandline arguments ([Run using script](#run-using-script)), or as a dictionary ([Run using Flask](#run-using-flask)).
 
-> **Note:** Environment variable equivalents of command line arguments have precedence over command line arguments.
+> Environment variable equivalents of command line arguments have precedence over command line arguments.
 
 ##### Initialise the database (--initdb)
 When specified the database will be initialised before use, resulting on the removal of all data.
 
 The environment variable equivalent is `INIT_DB_ARG`.
 
-> **Note:** This operation should not be confused with [Database Migration](#database-migration) which updates
+> This operation should not be confused with [Database Migration](#database-migration) which updates
 > the database schema.
 
-> **Note:** As [Gunicorn](https://gunicorn.org/) has no inter-worker method of communication to coordinate the database initialisation,
+> As [Gunicorn](https://gunicorn.org/) has no inter-worker method of communication to coordinate the database initialisation,
 there must be only one worker when initialising the database. [Gunicorn](https://gunicorn.org/) uses the `WEB_CONCURRENCY` environment variable as 
 the [default value for the number of workers](https://docs.gunicorn.org/en/stable/settings.html#workers). 
 If not set, Heroku provides a `WEB_CONCURRENCY` value [depending on the dyno size](https://devcenter.heroku.com/articles/optimizing-dyno-usage#python).  
@@ -264,7 +265,7 @@ When specified, an API template Markdown document detailing all the application 
 
 The environment variable equivalent is `GENERATE_API_ARG`, however it should not be used on Heroku.
 
-> **Note:** The API Markdown documentation file will be generated in the [instance](instance) folder.
+> The API Markdown documentation file will be generated in the [instance](instance) folder.
 
 #### Database Migration
 Once the application is configured for a blank database, as specified in [Application Configuration](#application-configuration), 
@@ -392,7 +393,7 @@ and player's in [players.json](test/postman/players.json).
 * Click the `Select file` button, then browse to and select the [managers.json](test/postman/managers.json) file.
 * Click the `Run Udacity FSWD TeamPicker` button, to run the requests.
 * All the folder requests will run 3 times, once for each manager.
-> **Note:** The requests should be run in the listed order. Failure to do so will result in incorrect user setup. 
+> The requests should be run in the listed order. Failure to do so will result in incorrect user setup. 
 
 ##### Setup players
 Follow the same procedure as for [Setup managers](#setup-managers), except for using the `player setup` folder from the collection,

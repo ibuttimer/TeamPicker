@@ -45,6 +45,36 @@ GENERATE_API_ARG_LONG = "generate_api"
 GENERATE_API_ARG_SHORT = "ga"
 
 
+def convert_env_var(k):
+    """
+    Read and convert an environment variable.
+    :param k: variable name
+    :return:
+    """
+    value = os.environ.get(k)
+    if k in [DEBUG, TESTING, DB_INSTANCE_RELATIVE_CONFIG,
+             'SQLALCHEMY_TRACK_MODIFICATIONS',
+             INIT_DB_ARG, POSTMAN_TEST_ARG]:
+        # Convert boolean variables.
+        value = eval_environ_var_truthy(k)
+    elif k in [DB_URI, DB_URI_ENV_VAR, DB_DRIVER, DB_USERNAME,
+               DB_PASSWORD, DB_HOST, GENERATE_API_ARG]:
+        # Convert str or None variables.
+        value = eval_environ_var_none(k)
+        if k == DB_URI_ENV_VAR and value is not None:
+            # Read value Database URL environment variable.
+            value = eval_environ_var_none(value)
+    elif k in [DB_PORT, PERMANENT_SESSION_LIFETIME]:
+        # Convert integer variables.
+        value = eval_environ_var_none(k)
+        value = int(value) if value is not None else None
+    elif k in [ALGORITHMS]:
+        # Convert list of str variables.
+        value = list(map(str.strip,
+                         json.loads(value.replace("'", '"'))))
+    return value
+
+
 def create_app(args: argparse.Namespace, test_config=None):
     """
     Application factory.
@@ -88,30 +118,6 @@ def create_app(args: argparse.Namespace, test_config=None):
             config_mapping = None
         else:
             # Load from environment variables.
-            def convert_env_var(k):
-                value = os.environ.get(k)
-                if k in [DEBUG, TESTING, DB_INSTANCE_RELATIVE_CONFIG,
-                         'SQLALCHEMY_TRACK_MODIFICATIONS',
-                         INIT_DB_ARG, POSTMAN_TEST_ARG]:
-                    # Convert boolean variables.
-                    value = eval_environ_var_truthy(k)
-                elif k in [DB_URI, DB_URI_ENV_VAR, DB_DRIVER, DB_USERNAME,
-                           DB_PASSWORD, DB_HOST, GENERATE_API_ARG]:
-                    # Convert str or None variables.
-                    value = eval_environ_var_none(k)
-                    if k == DB_URI_ENV_VAR and value is not None:
-                        # Read value Database URL environment variable.
-                        value = eval_environ_var_none(value)
-                elif k in [DB_PORT, PERMANENT_SESSION_LIFETIME]:
-                    # Convert integer variables.
-                    value = eval_environ_var_none(k)
-                    value = int(value) if value is not None else None
-                elif k in [ALGORITHMS]:
-                    # Convert list of str variables.
-                    value = list(map(str.strip,
-                                     json.loads(value.replace("'", '"'))))
-                return value
-
             config_mapping = {
                 k: convert_env_var(k) for k in ALL_CONFIG_VARIABLES
             }
@@ -152,7 +158,8 @@ def create_app(args: argparse.Namespace, test_config=None):
     # Environment variables have precedence over command line arguments.
     for k in CMD_LINE_ARGS:
         if k in os.environ:
-            cmd_line_args[k] = config_mapping.get(k, cmd_line_args[k])
+            cmd_line_args[k] = config_mapping.get(k, cmd_line_args[k]) \
+                if config_mapping is not None else convert_env_var(k)
 
     logger().debug(fmt_log(f"Command line: {cmd_line_args}"))
 

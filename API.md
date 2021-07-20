@@ -371,10 +371,10 @@ Endpoint to handle requests to get/update a match.
 |                   | Description |
 |------------------:|-------------|
 | **Endpoint**      | `/matches/<int:match_id>` <br> where `<match_id>` is the id of the match |
-| **Method**        | `GET, PATCH` |
-| **Request Body**  | `PATCH`: see [Create a match (UI)](#create-a-match-ui) |
+| **Method**        | `GET, PATCH, POST` |
+| **Request Body**  | `PATCH`/`POST`: see [Create a match (UI)](#create-a-match-ui) |
 | **Data type**     | - |
-| **Content-Type**  | `PATCH`: see [Create a match (UI)](#create-a-match-ui) |
+| **Content-Type**  | `PATCH`/`POST`: see [Create a match (UI)](#create-a-match-ui) |
 | **Response**      | 200: OK <br> 302: FOUND - redirect |
 | **Response Body** | html |
 | **Errors**        | 400: BAD REQUEST <br> 401: UNAUTHORISED <br> 404: NOT FOUND <br> 422: UNPROCESSABLE ENTITY |
