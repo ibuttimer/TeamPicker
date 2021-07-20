@@ -387,7 +387,7 @@ def get_team_id_and_match(match_id: int):
     return profile_team_id, match
 
 
-@requires_auth(permissions=GET_PATCH_PERMISSION, join=Conjunction.OR)
+@requires_auth(permissions=GET_POST_PATCH_PERMISSION, join=Conjunction.OR)
 def match_by_id_ui(payload: dict, match_id: int):
     """
     Match get/update.
@@ -396,21 +396,22 @@ def match_by_id_ui(payload: dict, match_id: int):
     :return:
 
     A GET returns the form to be edited
-    A POST persists the updates
+    A PATCH/POST persists the updates
     """
     profile_team_id, match = get_team_id_and_match(match_id)
 
     is_get = (request.method == GET)
-    is_patch = (request.method == PATCH)
+    is_update = (request.method == PATCH) or (request.method == POST)
     response = None
 
     if is_get:
         # Match data
         form_data = data_to_form(match)
         form = MatchForm(formdata=MultiDict(form_data))
-    elif is_patch:
-        # Need patch for update.
-        auth_result = check_auth(permission=PATCH_MATCH_PERMISSION)
+    elif is_update:
+        # Need patch/post for update.
+        auth_result = check_auth(permissions=POST_PATCH_PERMISSION,
+                                 join=Conjunction.OR)
         if isinstance(auth_result, Response):
             # Failed auth check, return redirect response.
             return auth_result
@@ -422,7 +423,7 @@ def match_by_id_ui(payload: dict, match_id: int):
     # Allow past date/times for start time.
     set_match_form_choices_validators(form, profile_team_id, FormArgs.FREE_MIN)
 
-    if is_patch and form.validate_on_submit():
+    if is_update and form.validate_on_submit():
         # Persist updates. Updating resets the selections, not great UX but
         # that is it for now.
         updates = data_from_form(form, profile_team_id) | {M_SELECTIONS: []}

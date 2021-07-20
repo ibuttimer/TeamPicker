@@ -1129,7 +1129,7 @@ class TestMatchUiCase(UiBaseTestCase):
                             expected="Selected"
                             if player[SELECTION] else "Not Selected",
                             attribute="title", match=MatchParam.EQUAL)
-                    elif player[M_ID] == user.id:
+                    elif player[M_ID] == user.id and player[SELECTION]:
                         # Verify player set confirmation available.
                         for selector, attribute in [
                             (CONFIRM, None), (UNSURE, None),

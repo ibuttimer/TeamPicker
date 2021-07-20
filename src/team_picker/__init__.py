@@ -231,7 +231,7 @@ def create_app(args: argparse.Namespace, test_config=None):
          MATCHES_UI_URL, create_match_ui, [POST]),
         ("Get/update a match (UI)",
          "Endpoint to handle requests to get/update a match.",
-         MATCH_BY_ID_UI_URL, match_by_id_ui, [GET, PATCH]),
+         MATCH_BY_ID_UI_URL, match_by_id_ui, [GET, PATCH, POST]),
         ("Search match (UI)",
          "Endpoint to handle match search requests.",
          SEARCH_MATCH_URL, search_match_ui, [POST]),
