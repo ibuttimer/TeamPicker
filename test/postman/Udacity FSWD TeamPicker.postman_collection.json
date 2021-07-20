@@ -1045,7 +1045,7 @@
 		},
 		{
 			"key": "run_mode",
-			"value": ""
+			"value": "iteration"
 		},
 		{
 			"key": "auth0_domain",
@@ -1073,7 +1073,7 @@
 		},
 		{
 			"key": "host",
-			"value": ""
+			"value": "http://localhost:5000"
 		},
 		{
 			"key": "manager_role",

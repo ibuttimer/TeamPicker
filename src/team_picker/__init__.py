@@ -44,6 +44,16 @@ POSTMAN_TEST_ARG_SHORT = "pt"
 GENERATE_API_ARG_LONG = "generate_api"
 GENERATE_API_ARG_SHORT = "ga"
 
+RESPONSE_HEADERS = [
+    # CORS
+    ('Access-Control-Allow-Headers', 'Content-Type,Authorization,true'),
+    ('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS'),
+    # No caching.
+    ('Cache-Control', 'no-cache, no-store, must-revalidate'),   # HTTP 1.1.
+    ('Pragma', 'no-cache'),   # HTTP 1.0.
+    ('Expires', '0'),   # Proxies.
+]
+
 
 def convert_env_var(k):
     """
@@ -186,10 +196,8 @@ def create_app(args: argparse.Namespace, test_config=None):
     # CORS Headers
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Headers',
-                             'Content-Type,Authorization,true')
-        response.headers.add('Access-Control-Allow-Methods',
-                             'GET,PATCH,POST,DELETE,OPTIONS')
+        for k, v in RESPONSE_HEADERS:
+            response.headers.add(k, v)
         return response
 
     @app.context_processor

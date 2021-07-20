@@ -1,5 +1,60 @@
 # TeamPicker
 
+- [Motivation](#motivation)
+- [Getting Started](#getting-started)
+  - [Reference Application](#reference-application)
+  - [Application Layout](#application-layout)
+  - [API](#api)
+  - [Installing Dependencies](#installing-dependencies)
+    - [Python 3.9](#python-39)
+    - [Virtual Environment](#virtual-environment)
+      - [Terminal Window](#terminal-window)
+      - [Key Dependencies](#key-dependencies)
+      - [Authorisation Dependencies](#authorisation-dependencies)
+        - [TeamPicker Auth0 Application](#teampicker-auth0-application)
+        - [TeamPicker M2M Auth0 Application](#teampicker-m2m-auth0-application)
+        - [TeamPicker Auth0 API](#teampicker-auth0-api)
+    - [Database schema](#database-schema)
+    - [Install dependencies](#install-dependencies)
+    - [Application Configuration](#application-configuration)
+      - [Database Configuration](#database-configuration)
+      - [.env file](#env-file)
+        - [Create .env file](#create-env-file)
+      - [Configuration file](#configuration-file)
+        - [Create configuration file](#create-configuration-file)
+      - [Environment variables](#environment-variables)
+    - [Application Arguments](#application-arguments)
+      - [Initialise the database (--initdb)](#initialise-the-database---initdb)
+      - [Disable server-side sessions (--postman_test)](#disable-server-side-sessions---postman_test)
+      - [Generate API markdown (--generate_api)](#generate-api-markdown---generate_api)
+    - [Database Migration](#database-migration)
+    - [Database Initialisation](#database-initialisation)
+  - [Run the application](#run-the-application)
+    - [Run using script](#run-using-script)
+    - [Run using `flask`](#run-using-flask)
+  - [Test](#test)
+    - [Unit Test](#unit-test)
+- [Application Operation](#application-operation)
+  - [Pre-configured users](#pre-configured-users)
+    - [User setup using Postman](#user-setup-using-postman)
+      - [Setup managers](#setup-managers)
+      - [Setup players](#setup-players)
+      - [Individual requests in Postman collection](#individual-requests-in-postman-collection)
+  - [Additional users](#additional-users)
+  - [Usage](#usage)
+    - [Role functionality](#role-functionality)
+    - [Login](#login)
+    - [Logout](#logout)
+    - [List matches](#list-matches)
+    - [Search matches](#search-matches)
+    - [Create/update matches](#createupdate-matches)
+      - [Create matches](#create-matches)
+      - [Update matches](#update-matches)
+    - [Make match selections](#make-match-selections)
+    - [View match selections](#view-match-selections)
+    - [Confirm match selections](#confirm-match-selections)
+    - [JWT](#jwt)
+
 ## Motivation
 The purpose of TeamPicker is to provide an application that enables the management of sports teams.
 Following registration, a manager must create a team during setup. 
@@ -327,7 +382,7 @@ See [Run The Application](https://flask.palletsprojects.com/en/2.0.x/tutorial/fa
 
 ### Test
 #### Unit Test
-A number of unit tests are available in the [test](#test) folder. 
+A number of unit tests are available in the [test](test) folder. 
 The tests are performed against an in-memory sqlite database. 
 
 From a [Terminal Window](#terminal-window), run the following commands to run all tests:
@@ -384,6 +439,18 @@ To expedite the setup of these users on a new database, the [Postman](https://ww
 The manager user's data is available in [managers.json](test/postman/managers.json), 
 and player's in [players.json](test/postman/players.json). 
 
+> The application _**must**_ be started with [Disable server-side sessions](#disable-server-side-sessions---postman_test) option. 
+
+When running as a script:
+```shell
+For Linux and Mac:                                For Windows:
+$ python teampicker.py --postman_test             > python teampicker.py --postman_test
+```
+or passed via the `FLASK_APP` environment variable.
+```bash
+  FLASK_APP=src.team_picker:create_app({"postman_test":True})
+```
+
 ##### Setup managers
 * Load [Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity%20FSWD%20TeamPicker.postman_collection.json) into Postman.
 * Open the collection and select the collection `Variables` tab. 
@@ -402,7 +469,7 @@ All the folder requests will run 9 times, once for each player.
 
 Please see [Running collections with data files](https://learning.postman.com/docs/running-collections/working-with-data-files/) for more information.
 
-###### Individual requests in Postman collection
+##### Individual requests in Postman collection
 In order to send individual requests from [Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity%20FSWD%20TeamPicker.postman_collection.json)
 rather than the running in the listed order:
 * Load [Udacity FSWD TeamPicker.postman_collection.json](test/postman/Udacity%20FSWD%20TeamPicker.postman_collection.json) into Postman.
