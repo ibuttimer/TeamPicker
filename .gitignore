@@ -145,4 +145,7 @@ cython_debug/
 # Intellij projects
 /.idea/
 **/*.iml
+
+# Project specific
 /deploy/heroku_cfg.bat
+/deploy/data.sql

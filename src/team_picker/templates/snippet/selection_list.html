@@ -56,7 +56,7 @@
         </td>
         {% endif %}
         <td>
-          {% if player.is_self %}
+          {% if player.is_self and player.selected %}
           <!-- Logged in player has confirm option  -->
           <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
             <input type="radio" class="btn-check" name="btn_radio_y" id="toggle-confirm-y" autocomplete="off"

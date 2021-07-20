@@ -22,9 +22,20 @@ Use details from the `Database Credentials` in the Settings of the attached data
 > 
 > Heroku rotates credentials periodically and updates applications where this database is attached.
 
+> The PostgreSQL interactive terminal (psql) must be installed on your local machine. See [Set up Postgres on Windows](https://devcenter.heroku.com/articles/heroku-postgresql#set-up-postgres-on-windows)
+> or [Set up Postgres on Linux](https://devcenter.heroku.com/articles/heroku-postgresql#set-up-postgres-on-linux).
+
 ```shell
+Connect to server
 $ heroku pg:psql <postgresql-datastore-name> --app teampicker-fswd
+
+Connect to database
 $ teampicker-fswd::DATABASE=> \c <database name>
+
+List database tables
 $ teampicker-fswd::DATABASE=> \dt
+
+Run SQL file
+$ teampicker-fswd::DATABASE=> \i \path\to\sample_data.sql
 ```
 
