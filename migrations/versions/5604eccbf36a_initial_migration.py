@@ -1,8 +1,8 @@
-"""Initial migration.
+"""Initial migration
 
-Revision ID: 1ed2d19c24fa
+Revision ID: 5604eccbf36a
 Revises: 
-Create Date: 2021-06-25 08:25:58.964562
+Create Date: 2021-07-20 12:21:34.378283
 
 """
 from alembic import op
@@ -11,8 +11,7 @@ import sqlalchemy as sa
 from team_picker import UNASSIGNED_TEAM_NAME, PRE_CONFIG_ROLE_NAMES
 
 # revision identifiers, used by Alembic.
-
-revision = '1ed2d19c24fa'
+revision = '5604eccbf36a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,6 +23,15 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('role', sa.String(length=80), nullable=False),
     sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('sessions',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('session_id', sa.String(length=255), nullable=True),
+    sa.Column('data', sa.LargeBinary(), nullable=True),
+    sa.Column('expiry', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('session_id'),
+    sa.UniqueConstraint('session_id')
     )
     op.create_table('teams',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -97,5 +105,6 @@ def downgrade():
     op.drop_table('users')
     op.drop_table('matches')
     op.drop_table('teams')
+    op.drop_table('sessions')
     op.drop_table('roles')
     # ### end Alembic commands ###

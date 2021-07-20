@@ -285,7 +285,7 @@ the database must be prepared for the application as follows:
     > set FLASK_ENV=development
     > flask db upgrade 
     ```
-  This will configure the database to the state required by the application, using the script [1ed2d19c24fa_initial_migration.py](migrations/versions/1ed2d19c24fa_initial_migration.py).
+  This will configure the database to the state required by the application, using the script [5604eccbf36a_initial_migration.py](migrations/5604eccbf36a_initial_migration.py).
 
 #### Database Initialisation
 Once the database has been migrated, it may be re-initialised by specifying the [Initialise the database (--initdb)](#initialise-the-database---initdb) application argument.
