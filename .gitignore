@@ -149,3 +149,4 @@ cython_debug/
 # Project specific
 /deploy/heroku_cfg.bat
 /deploy/data.sql
+/env.sh

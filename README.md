@@ -258,6 +258,8 @@ For example, to configure the application to use:
 Environment variables corresponding to the keys in [sample.env](instance/sample.env) and [sample-config.py](instance/sample-config.py)
 should be set as appropriate.
 
+An appropriately updated copy of the bash script [sample.env.sh](sample.env.sh) may be used to set the environment variables.
+
 For example, to configure the application to use:
 * an SQLite database file `database.db` in the [instance](instance) folder
 
