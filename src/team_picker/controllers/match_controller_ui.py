@@ -22,12 +22,10 @@ from ..constants import (POST_MATCH_PERMISSION, DELETE_MATCH_PERMISSION,
                          SELECTIONS_QUERY, PLAYER_ROLE, POST, YES_ARG, NO_ARG,
                          PATCH_OWN_MATCH_PERMISSION, TEAM, VENUE, PATCH
                          )
-from ..forms import (MatchForm, set_match_form_choices_validators
-                     )
-from ..forms.forms import MatchSearchForm, TEAM_SCORE, OPPOSITION_SCORE
-from ..forms.misc import (NO_OPTION_SELECTED, HOME_VENUE, AWAY_VENUE, DateRange,
-                          DATE_RANGE_CHOICES
-                          )
+from ..forms import (
+    MatchForm, set_match_form_choices_validators, MatchSearchForm,
+    TEAM_SCORE, OPPOSITION_SCORE
+)
 from ..models import (M_START_TIME, M_HOME_ID, M_AWAY_ID, Match, M_ID,
                       M_SCORE_HOME, M_SCORE_AWAY, M_RESULT, M_NAME, M_SURNAME,
                       M_SELECTIONS, entity_to_dict
@@ -41,7 +39,10 @@ from ..services import (get_all_matches, get_match_by_id as get_match_by_id_svc,
                         is_selected_and_confirmed, SelectChoice,
                         set_confirmation, get_match_by_id_and_team, is_selected
                         )
-from ..util import FormArgs, VENUE_CHOICES
+from ..util import (
+    FormArgs, VENUE_CHOICES, NO_OPTION_SELECTED, HOME_VENUE, AWAY_VENUE,
+    DateRange, DATE_RANGE_CHOICES
+)
 from ..util.exception import AbortError
 from ..util.misc import choose_by_ls_eq_gr, choose_by_home_venue, choose_by_eq
 

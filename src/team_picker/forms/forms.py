@@ -1,14 +1,13 @@
 from typing import Union, Any
 
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, RadioField, DateTimeField, \
-    BooleanField, IntegerField
-from wtforms.validators import InputRequired, AnyOf, NumberRange, \
-    ValidationError, NoneOf
-
-from .misc import (NO_OPTION_SELECTED, HOME_VENUE, VENUE_CHOICES, VENUES,
-                   DateRange, DATE_RANGE_CHOICES, DATE_RANGES
-                   )
+from wtforms import (
+    SelectField, StringField, RadioField, DateTimeField, BooleanField,
+    IntegerField
+)
+from wtforms.validators import (
+    InputRequired, AnyOf, NumberRange, ValidationError, NoneOf
+)
 
 from .validators import ValidateDateTime
 from ..models.exception import ModelError
@@ -17,7 +16,10 @@ from ..services import (get_all_roles, get_all_teams, get_unassigned_team_id,
                         verify_match, get_all_team_names
                         )
 from ..models import M_ID, M_ROLE, M_NAME, M_START_TIME, M_HOME_ID, M_AWAY_ID
-from ..util import current_datetime, FormArgs
+from ..util import (
+    current_datetime, FormArgs, NO_OPTION_SELECTED, HOME_VENUE, VENUE_CHOICES,
+    VENUES, DateRange, DATE_RANGE_CHOICES, DATE_RANGES
+)
 from ..auth import get_profile_team_id
 from ..util.misc import choose_by_eq, choose_by_home_venue
 
