@@ -211,58 +211,63 @@ class UsersSetupTestCase(UiBaseTestCase):
         """
         Test only managers are able to create teams.
         """
-        with self.client as client:
-            for key, user in self.users.items():
-                role, index, team_name = UsersSetupTestCase.split_user_key(key)
+        with self.app.app_context():
+            with self.client as client:
+                for key, user in self.users.items():
+                    role, index, team_name = \
+                        UsersSetupTestCase.split_user_key(key)
 
-                # Need to add user to database to perform test.
-                new_user = user.to_dict(ignore=[M_ID])
-                new_user[M_TEAM_ID] = UNASSIGNED_TEAM.id
-                created = create_user(new_user)
+                    # Need to add user to database to perform test.
+                    new_user = user.to_dict(ignore=[M_ID])
+                    new_user[M_TEAM_ID] = UNASSIGNED_TEAM.id
+                    created = create_user(new_user)
 
-                with self.subTest(user=user):
+                    with self.subTest(user=user):
 
-                    user_types = [UserType.PUBLIC, UserType.UNAUTHORISED] + \
-                                 [UserType.MANAGER
-                                  if user.role_id == ROLES[MANAGER_ROLE].id
-                                  else UserType.PLAYER]
+                        user_types = [
+                            UserType.PUBLIC, UserType.UNAUTHORISED
+                        ] + [
+                            UserType.MANAGER
+                            if user.role_id == ROLES[MANAGER_ROLE].id
+                            else UserType.PLAYER
+                        ]
 
-                    for user_type in user_types:
-                        with self.subTest(user_type=user_type):
-                            permissions = self.set_permissions(
-                                user_type, profile={
-                                    M_NAME: user.name,
-                                    M_AUTH0_ID: user.auth0_id,
-                                    SETUP_COMPLETE: False,
-                                    DB_ID: created[M_ID]
-                                }, role=role)
+                        for user_type in user_types:
+                            with self.subTest(user_type=user_type):
+                                permissions = self.set_permissions(
+                                    user_type, profile={
+                                        M_NAME: user.name,
+                                        M_AUTH0_ID: user.auth0_id,
+                                        SETUP_COMPLETE: False,
+                                        DB_ID: created[M_ID]
+                                    }, role=role)
 
-                            resp = client.post(
-                                make_url(TEAM_SETUP_URL), json={
-                                    M_NAME: team_name
-                                }
-                            )
+                                resp = client.post(
+                                    make_url(TEAM_SETUP_URL), json={
+                                        M_NAME: team_name
+                                    }
+                                )
 
-                            has = BaseTestCase.has_permission(
-                                permissions, POST_TEAM_PERMISSION)
-                            if has:
-                                http_status = HTTPStatus.FOUND
-                                url = DASHBOARD_URL
-                            elif user_type == UserType.PUBLIC or \
-                                    user_type == UserType.PLAYER:
-                                http_status = HTTPStatus.UNAUTHORIZED
-                                url = None
-                            else:
-                                http_status = HTTPStatus.FOUND
-                                url = LOGIN_URL
+                                has = BaseTestCase.has_permission(
+                                    permissions, POST_TEAM_PERMISSION)
+                                if has:
+                                    http_status = HTTPStatus.FOUND
+                                    url = DASHBOARD_URL
+                                elif user_type == UserType.PUBLIC or \
+                                        user_type == UserType.PLAYER:
+                                    http_status = HTTPStatus.UNAUTHORIZED
+                                    url = None
+                                else:
+                                    http_status = HTTPStatus.FOUND
+                                    url = LOGIN_URL
 
-                            self.assert_response_status_code(
-                                http_status, resp.status_code)
+                                self.assert_response_status_code(
+                                    http_status, resp.status_code)
 
-                            soup = BeautifulSoup(resp.data, 'html.parser')
+                                soup = BeautifulSoup(resp.data, 'html.parser')
 
-                            if http_status == HTTPStatus.FOUND:
-                                UiBaseTestCase.assert_redirect(self, soup, url)
+                                if http_status == HTTPStatus.FOUND:
+                                    UiBaseTestCase.assert_redirect(self, soup, url)
 
 
 # Make the tests conveniently executable

@@ -3,8 +3,6 @@ from http import HTTPStatus
 from typing import Union, Any, Optional, List
 from unittest.mock import patch
 
-from flask_sqlalchemy import SQLAlchemy
-
 from misc import MatchParam, UserType
 from team_picker import create_app, parse_app_args, INIT_DB_ARG_LONG
 from team_picker.constants import *
@@ -102,7 +100,7 @@ class BaseTestCase(unittest.TestCase):
 
         """Define test variables and initialize app."""
         base_url = 'http://localhost:5000/'
-        self.app = create_app(
+        self.app, self.db = create_app(
             args=parse_app_args(
                 f'--{INIT_DB_ARG_LONG}'.split()),
             test_config={
@@ -134,12 +132,6 @@ class BaseTestCase(unittest.TestCase):
 
         # Bind the app to the current context.
         with self.app.app_context():
-            self.db = SQLAlchemy()
-            self.db.init_app(self.app)
-            # create all tables
-            self.db.drop_all()
-            self.db.create_all()
-
             self.assertEqual(0, self.db.session.query(User).count())
             self.assertEqual(len(ROLES), self.db.session.query(Role).count())
             self.assertEqual(1, self.db.session.query(Team).count())
@@ -171,6 +163,14 @@ class BaseTestCase(unittest.TestCase):
         self.mocker.get(VERIFY_DECODE_JWT).return_value = NO_PERMISSIONS
         self.mocker.get(GET_MGMT_API_TOKEN).return_value = \
             "no mgmt token required as it's ignored"
+
+    def context_wrapper(self, func):
+        """
+        Wrapper to run function in app context
+        :param func: function to run
+        """
+        with self.app.app_context():
+            func()
 
     @staticmethod
     def get_permissions_and_role(user_type: UserType,

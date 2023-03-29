@@ -104,7 +104,7 @@ The API documentation is available in [API.md](API.md).
 
 ### Installing Dependencies
 
-#### Python 3.9
+#### Python
 
 Follow instructions to install the latest version of python for your platform in the [python docs](https://docs.python.org/3/using/unix.html#getting-and-installing-the-latest-version-of-python)
 
@@ -143,23 +143,23 @@ by executing a client credentials exchange. *TeamPicker M2M* is used to assign r
 ###### TeamPicker Auth0 API
 The following are the details of the Auth0 API:
 
-| Permission | Description | TeamManager<br>Role | TeamPlayer<br>Role  |
-| ------------- | ------------- |:-----------:|:-----------:|
-| delete:match     | Delete a match       | &checkmark; | &cross; |
-| delete:own-user  | Delete personal user | &checkmark; | &checkmark; |
-| get:match	       | Get a match          | &checkmark; | &checkmark; |
-| get:own-user     | Read personal user   | &checkmark; | &checkmark; |
-| get:role	       | Read a role          | &checkmark; | &checkmark; |
-| get:team	       | Read a team          | &checkmark; | &checkmark; |
-| get:user	       | Read a user          | &checkmark; | &checkmark; |
-| patch:match	   | Update a match       | &checkmark; | &cross; |
-| patch:own-match  | Update personal info for match | &cross; | &checkmark; |
-| patch:own-user   | Update personal user | &checkmark; | &checkmark; |
-| patch:team	   | Update a team        | &checkmark; | &cross; |
-| patch:user	   | Update a user        | &cross; | &cross; |
-| post:match	   | Create a match       | &checkmark; | &cross; |
-| post:team	       | Create a team        | &checkmark; | &cross; |
-| post:user	       | Create a user        | &checkmark; | &cross; |
+| Permission      | Description                    | TeamManager<br>Role | TeamPlayer<br>Role |
+|-----------------|--------------------------------|:-------------------:|:------------------:|
+| delete:match    | Delete a match                 |     &checkmark;     |      &cross;       |
+| delete:own-user | Delete personal user           |     &checkmark;     |    &checkmark;     |
+| get:match       | Get a match                    |     &checkmark;     |    &checkmark;     |
+| get:own-user    | Read personal user             |     &checkmark;     |    &checkmark;     |
+| get:role	       | Read a role                    |     &checkmark;     |    &checkmark;     |
+| get:team	       | Read a team                    |     &checkmark;     |    &checkmark;     |
+| get:user	       | Read a user                    |     &checkmark;     |    &checkmark;     |
+| patch:match     | Update a match                 |     &checkmark;     |      &cross;       |
+| patch:own-match | Update personal info for match |       &cross;       |    &checkmark;     |
+| patch:own-user  | Update personal user           |     &checkmark;     |    &checkmark;     |
+| patch:team	     | Update a team                  |     &checkmark;     |      &cross;       |
+| patch:user	     | Update a user                  |       &cross;       |      &cross;       |
+| post:match	     | Create a match                 |     &checkmark;     |      &cross;       |
+| post:team	      | Create a team                  |     &checkmark;     |      &cross;       |
+| post:user	      | Create a user                  |     &checkmark;     |      &cross;       |
 
 #### Database schema
 The following database schema has been implemented:
@@ -179,11 +179,11 @@ specify the application configuration. There are three methods of configuring th
 ##### Database Configuration
 The database configuration must be set in one of three different ways. In order of precedence they are:
 1. Set the `DB_URI` variable to a [Connection URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#connection-uri-format).
-1. Set the `DB_URI_ENV_VAR` variable to the name of an environment variable which is set to a [Connection URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#connection-uri-format).
+2. Set the `DB_URI_ENV_VAR` variable to the name of an environment variable which is set to a [Connection URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#connection-uri-format).
     
     E.g. A typical use case is with a Heroku Postgres add-on which adds a `DATABASE_URL` environment variable that contains the database URI.
 
-1. Set the `DB_DIALECT`,`DB_DRIVER`,`DB_USERNAME`,`DB_PASSWORD`,`DB_HOST`,`DB_PORT` and `DB_DATABASE` variables from which a [Connection URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#connection-uri-format) is created.
+3. Set the `DB_DIALECT`,`DB_DRIVER`,`DB_USERNAME`,`DB_PASSWORD`,`DB_HOST`,`DB_PORT` and `DB_DATABASE` variables from which a [Connection URI](https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/#connection-uri-format) is created.
 
 ##### .env file
 * The configuration file should follow the format specified by [sample.env](instance/sample.env).
@@ -193,7 +193,7 @@ For example, to configure the application to use:
 
 ###### Create .env file
 1. Copy the file [sample.env](instance/sample.env) and save as `.env`, in the project root folder.
-1. Edit the new file to set the required database and authentication configuration.
+2. Edit the new file to set the required database and authentication configuration.
     ```
     DB_DIALECT = sqlite
     DB_DATABASE = database.db
@@ -232,7 +232,7 @@ For example, to configure the application to use:
 
 ###### Create configuration file
 1. Copy the file [sample-config.py](instance/sample-config.py) and save as `config.py`, in the [instance](instance) folder.
-1. Edit the new file to set the required database and authentication configuration.
+2. Edit the new file to set the required database and authentication configuration.
     ```python
     DB_DIALECT = 'sqlite'
     DB_DATABASE = 'database.db'
@@ -247,7 +247,7 @@ For example, to configure the application to use:
     Please see [sample-config.py](instance/sample-config.py) for additional information.
     > As the configuration file is a python script, standard python string formatting may be used. 
 
-1. Set the environment variables, `APP_CONFIG_PATH` and `INST_REL_CONFIG` appropriately.
+3. Set the environment variables, `APP_CONFIG_PATH` and `INST_REL_CONFIG` appropriately.
 
     ```shell
     For Linux and Mac:                            For Windows:
@@ -334,12 +334,10 @@ the database must be prepared for the application as follows:
     ```bash
     For Linux and Mac:
     $ export FLASK_APP=src.team_picker:create_app({})
-    $ export FLASK_ENV=development
     $ flask db upgrade 
     
     For Windows:
     > set FLASK_APP=src.team_picker:create_app({})
-    > set FLASK_ENV=development
     > flask db upgrade 
     ```
   This will configure the database to the state required by the application, using the script [5604eccbf36a_initial_migration.py](migrations/versions/5604eccbf36a_initial_migration.py).
@@ -377,10 +375,17 @@ From a [Terminal Window](#terminal-window), run the following commands:
 ```bash
 For Linux and Mac:                                For Windows:
 $ export FLASK_APP=src.team_picker:create_app({}) > set FLASK_APP=src.team_picker:create_app({})
-$ export FLASK_ENV=development                    > set FLASK_ENV=development
 $ flask run                                       > flask run 
 ```
 See [Run The Application](https://flask.palletsprojects.com/en/2.0.x/tutorial/factory/#run-the-application) for other operating systems.
+
+#### Run in debug mode
+> **Note:** To run with debug mode enabled specify the `--debug` [option](https://flask.palletsprojects.com/en/2.2.x/config/#debug-mode)
+```bash
+For Linux and Mac:                                For Windows:
+$ export FLASK_APP=src.team_picker:create_app({}) > set FLASK_APP=src.team_picker:create_app({})
+$ flask run --debug                               > flask run --debug 
+```
 
 ### Test
 #### Unit Test
@@ -397,14 +402,14 @@ $ python -m test_all                          > python -m test_all
 
 Alternatively, to run tests individually:
 
-| Test | Command |
-| ---- | ------- |
-| Roles database tests | `python -m test_roles` |
-| Teams database tests | `python -m test_teams` |
-| Users database tests | `python -m test_users` |
-| Matches database tests | `python -m test_matches` |
-| Users UI tests | `python -m test_user_setup_ui` |
-| Matches UI tests | `python -m test_match_ui` |
+| Test                   | Command                        |
+|------------------------|--------------------------------|
+| Roles database tests   | `python -m test_roles`         |
+| Teams database tests   | `python -m test_teams`         |
+| Users database tests   | `python -m test_users`         |
+| Matches database tests | `python -m test_matches`       |
+| Users UI tests         | `python -m test_user_setup_ui` |
+| Matches UI tests       | `python -m test_match_ui`      |
 
 ## Application Operation
 Once the application has been set up as outlined in [Getting Started](#getting-started), functionality 
@@ -417,20 +422,20 @@ in [Additional users](#additional-users).
 ### Pre-configured users
 The following users have been pre-configured on the [Auth0](https://auth0.com/) service:
 
-| Email | Password | First name | Surname | Role | Team |
-|-------|----------|------------|---------|------|:----:|
-| m1@team1.com | Manager1! | Manny | Uno | Manager | Team 1 |
-| p1@team1.com | Player1! | Patrik | Einer | Player | " |
-| p2@team1.com | Player2! | Pat | Ceann | Player | " |
-| p3@team1.com | Player3! | Patrice | Un | Player | " |
-| m2@team2.com | Manager2! | Manfred | Dos | Manager | Team 2 |
-| j1@team2.com | Player1! | Johann | Zwei | Player | " |
-| j2@team2.com | Player2! | Sean | Do | Player | " |
-| j3@team2.com | Player3! | Jean | Deux | Player | " |
-| m3@team3.com | Manager3! | Mildred | Tres | Manager | Team 3 |
-| s1@team3.com | Player1! | Joanna | Drei | Player | " |
-| s2@team3.com | Player2! | Dearbhla | Triur | Player | " |
-| s3@team3.com | Player3! | Jean | Trois | Player | " |
+| Email        | Password  | First name | Surname | Role    |  Team  |
+|--------------|-----------|------------|---------|---------|:------:|
+| m1@team1.com | Manager1! | Manny      | Uno     | Manager | Team 1 |
+| p1@team1.com | Player1!  | Patrik     | Einer   | Player  |   "    |
+| p2@team1.com | Player2!  | Pat        | Ceann   | Player  |   "    |
+| p3@team1.com | Player3!  | Patrice    | Un      | Player  |   "    |
+| m2@team2.com | Manager2! | Manfred    | Dos     | Manager | Team 2 |
+| j1@team2.com | Player1!  | Johann     | Zwei    | Player  |   "    |
+| j2@team2.com | Player2!  | Sean       | Do      | Player  |   "    |
+| j3@team2.com | Player3!  | Jean       | Deux    | Player  |   "    |
+| m3@team3.com | Manager3! | Mildred    | Tres    | Manager | Team 3 |
+| s1@team3.com | Player1!  | Joanna     | Drei    | Player  |   "    |
+| s2@team3.com | Player2!  | Dearbhla   | Triur   | Player  |   "    |
+| s3@team3.com | Player3!  | Jean       | Trois   | Player  |   "    |
 
 The [Auth0](https://auth0.com/) login credentials are the specified email and password. 
 The first name, surname, role and team are suggestions.
@@ -495,16 +500,16 @@ Additional users may be added as required.
 The functionality available depends on the user's role.
 
 #### Role functionality
-| Functionality | Manager | Player  |
-| ------------- |:-------:|:-------:|
-| Login         | &checkmark; | &checkmark; |
-| Logout        | &checkmark; | &checkmark; |
-| List matches  | &checkmark; | &checkmark; |
-| Search matches | &checkmark; | &checkmark; | 
-| Create/update matches | &checkmark; | &cross; |
-| Make match selections | &checkmark; | &cross; | 
-| View match selections | &checkmark; | &checkmark; | 
-| Confirm match selections | &cross; | &checkmark; | 
+| Functionality            |   Manager   |   Player    |
+|--------------------------|:-----------:|:-----------:|
+| Login                    | &checkmark; | &checkmark; |
+| Logout                   | &checkmark; | &checkmark; |
+| List matches             | &checkmark; | &checkmark; |
+| Search matches           | &checkmark; | &checkmark; | 
+| Create/update matches    | &checkmark; |   &cross;   |
+| Make match selections    | &checkmark; |   &cross;   | 
+| View match selections    | &checkmark; | &checkmark; | 
+| Confirm match selections |   &cross;   | &checkmark; | 
 
 #### Login
 On the application home screen, click the `Login or sign-up` button, and enter username and password.

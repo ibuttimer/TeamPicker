@@ -490,6 +490,12 @@ class TestMatchUiCase(UiBaseTestCase):
              if user.role_id == ROLES[PLAYER_ROLE].id
              else UserType.UNAUTHORISED)
 
+    @staticmethod
+    def user_type_generator(user: UserData):
+        for user_type in [UserType.PUBLIC, UserType.UNAUTHORISED,
+                          TestMatchUiCase.get_user_type(user)]:
+            yield user_type
+
     # @unittest.skip
     def test_create_match(self):
         """
@@ -504,8 +510,7 @@ class TestMatchUiCase(UiBaseTestCase):
             with self.subTest(user=user):
                 role = get_role_from_id(user.role_id)
 
-                for user_type in [UserType.PUBLIC, UserType.UNAUTHORISED,
-                                  TestMatchUiCase.get_user_type(user)]:
+                for user_type in self.user_type_generator(user):
                     with self.subTest(user_type=user_type):
                         with self.client as client:
                             # First verify the initial get of the match form.
@@ -545,7 +550,8 @@ class TestMatchUiCase(UiBaseTestCase):
                             self.assert_status_and_redirect(
                                 resp, HTTPStatus.FOUND, url=DASHBOARD_URL)
 
-    def pick_players(self, players: dict, team: int):
+    @staticmethod
+    def pick_players(players: dict, team: int):
         return random.sample(
             players[team][M_ID], k=int(len(players[team][M_ID]) / 2))
 
@@ -645,7 +651,7 @@ class TestMatchUiCase(UiBaseTestCase):
                 else away_fld]
 
         # Generate match list as it should appear in UI, (it's
-        # different for each users depending on their team).
+        # different for each user depending on their team).
         ui_matches = []
         for match in test_matches:
             if match.home_id != user.team_id and match.away_id != user.team_id:
@@ -762,8 +768,7 @@ class TestMatchUiCase(UiBaseTestCase):
         # Check match listings.
         for key, user in self.users.items():
             with self.subTest(user=user):
-                for user_type in [UserType.PUBLIC, UserType.UNAUTHORISED,
-                                  TestMatchUiCase.get_user_type(user)]:
+                for user_type in self.user_type_generator(user):
                     with self.subTest(user_type=user_type):
                         # Verify matches listed correctly.
                         self.assert_matches_list(user, user_type, test_matches)
@@ -779,6 +784,13 @@ class TestMatchUiCase(UiBaseTestCase):
         Test only managers can update matches, and other users are
         redirected or rejected as appropriate.
         """
+        self.context_wrapper(self.check_update_matches)
+
+    def check_update_matches(self):
+        """
+        Test only managers can update matches, and other users are
+        redirected or rejected as appropriate.
+        """
         # Create matches to test with.
         test_matches, players = self.generate_test_matches()
 
@@ -788,13 +800,13 @@ class TestMatchUiCase(UiBaseTestCase):
             with self.subTest(user=user):
                 role = get_role_from_id(user.role_id)
 
-                for user_type in [UserType.PUBLIC, UserType.UNAUTHORISED,
-                                  TestMatchUiCase.get_user_type(user)]:
+                for user_type in self.user_type_generator(user):
                     with self.subTest(user_type=user_type):
                         with self.client as client:
 
                             if not first:
-                                # Get latest versions of matches from database.
+                                # Get the latest versions of matches from
+                                # database.
                                 test_matches = [MatchData.from_dict(m)
                                                 for m in get_all_matches()]
                             first = False
@@ -804,8 +816,7 @@ class TestMatchUiCase(UiBaseTestCase):
                                     # First verify the initial get of the match
                                     # form.
                                     is_playing = \
-                                        TestMatchUiCase.team_is_playing(user,
-                                                                        match)
+                                        self.team_is_playing(user, match)
 
                                     permissions, http_status, url = \
                                         self.set_permissions_and_profile(
@@ -829,7 +840,9 @@ class TestMatchUiCase(UiBaseTestCase):
                                     # Update match.
                                     else_code = FOUND_LOGIN
                                     if user_type == UserType.PLAYER:
-                                        else_code = UNAUTHORISED_NO_URL if is_playing else NOT_FOUND_NO_URL
+                                        else_code = \
+                                            UNAUTHORISED_NO_URL if is_playing \
+                                            else NOT_FOUND_NO_URL
                                     permissions, http_status, url = \
                                         self.set_permissions_and_profile(
                                             user, user_type, role,
@@ -885,44 +898,46 @@ class TestMatchUiCase(UiBaseTestCase):
         test_matches, _ = self.generate_test_matches(iterations=2)
 
         # Check match listings.
-        first = True
-        for key, user in self.users.items():
-            with self.subTest(user=user):
-                role = get_role_from_id(user.role_id)
+        with self.app.app_context():
+            first = True
+            for key, user in self.users.items():
+                with self.subTest(user=user):
+                    role = get_role_from_id(user.role_id)
 
-                for user_type in UserType:
-                    with self.subTest(user_type=user_type):
+                    for user_type in UserType:
+                        with self.subTest(user_type=user_type):
 
-                        if not first:
-                            # Get latest versions of matches from database.
-                            test_matches = [MatchData.from_dict(m)
-                                            for m in get_all_matches()]
-                        first = False
+                            if not first:
+                                # Get the latest versions of matches from
+                                # database.
+                                test_matches = [MatchData.from_dict(m)
+                                                for m in get_all_matches()]
+                            first = False
 
-                        for match in test_matches:
-                            if TestMatchUiCase.team_is_playing(user, match):
-                                to_delete = match
-                                break
-                        else:
-                            self.fail("No match found to delete")
+                            for match in test_matches:
+                                if self.team_is_playing(user, match):
+                                    to_delete = match
+                                    break
+                            else:
+                                self.fail("No match found to delete")
 
-                        with self.subTest(match=to_delete):
+                            with self.subTest(match=to_delete):
 
-                            permissions, http_status, url = \
-                                self.set_permissions_and_profile(
-                                    user, user_type, role,
-                                    DELETE_MATCH_PERMISSION
-                                )
+                                permissions, http_status, url = \
+                                    self.set_permissions_and_profile(
+                                        user, user_type, role,
+                                        DELETE_MATCH_PERMISSION
+                                    )
 
-                            with self.client as client:
-                                resp = client.delete(
-                                    make_url(MATCH_BY_ID_UI_URL, **{
-                                        MATCH_ID_PARAM: to_delete.id
-                                    })
-                                )
+                                with self.client as client:
+                                    resp = client.delete(
+                                        make_url(MATCH_BY_ID_UI_URL, **{
+                                            MATCH_ID_PARAM: to_delete.id
+                                        })
+                                    )
 
-                            self.assert_status_and_redirect(
-                                resp, http_status, url=url)
+                                self.assert_status_and_redirect(
+                                    resp, http_status, url=url)
 
     # @unittest.skip
     def test_search_matches(self):
@@ -938,8 +953,7 @@ class TestMatchUiCase(UiBaseTestCase):
             role = get_role_from_id(user.role_id)
 
             with self.subTest(user=user):
-                for user_type in [UserType.PUBLIC, UserType.UNAUTHORISED,
-                                  TestMatchUiCase.get_user_type(user)]:
+                for user_type in self.user_type_generator(user):
                     with self.subTest(user_type=user_type):
                         # First verify the initial get of the search form.
                         permissions, http_status, url = \
@@ -982,8 +996,7 @@ class TestMatchUiCase(UiBaseTestCase):
                                 }
                                 search_matches = []
                                 for match in test_matches:
-                                    if not TestMatchUiCase.team_is_playing(
-                                            user, match):
+                                    if not self.team_is_playing(user, match):
                                         continue
 
                                     if search == OPPOSITION:
@@ -991,12 +1004,13 @@ class TestMatchUiCase(UiBaseTestCase):
                                         # search.
                                         if kwargs[OPPOSITION] == \
                                                 NO_OPTION_SELECTED:
-                                            kwargs[OPPOSITION] = match.away_id \
+                                            kwargs[OPPOSITION] = \
+                                                match.away_id \
                                                 if user.team_id == \
                                                 match.home_id \
                                                 else match.home_id
 
-                                        if TestMatchUiCase.team_is_playing(
+                                        if self.team_is_playing(
                                                 kwargs[OPPOSITION], match):
                                             search_matches.append(match)
 
@@ -1162,8 +1176,7 @@ class TestMatchUiCase(UiBaseTestCase):
             role = get_role_from_id(user.role_id)
 
             with self.subTest(user=user):
-                for user_type in [UserType.PUBLIC, UserType.UNAUTHORISED,
-                                  TestMatchUiCase.get_user_type(user)]:
+                for user_type in self.user_type_generator(user):
                     with self.subTest(user_type=user_type):
                         for match in test_matches:
                             with self.subTest(match=match):
@@ -1187,8 +1200,7 @@ class TestMatchUiCase(UiBaseTestCase):
             is_manager = TestMatchUiCase.is_manager(user)
 
             with self.subTest(user=user):
-                for user_type in [UserType.PUBLIC, UserType.UNAUTHORISED,
-                                  TestMatchUiCase.get_user_type(user)]:
+                for user_type in self.user_type_generator(user):
                     with self.subTest(user_type=user_type):
                         count = 0
                         for match in test_matches:
@@ -1259,8 +1271,7 @@ class TestMatchUiCase(UiBaseTestCase):
             is_player = TestMatchUiCase.is_player(user)
 
             with self.subTest(user=user):
-                for user_type in [UserType.PUBLIC, UserType.UNAUTHORISED,
-                                  TestMatchUiCase.get_user_type(user)]:
+                for user_type in self.user_type_generator(user):
                     with self.subTest(user_type=user_type):
                         count = 0
                         for match in test_matches:

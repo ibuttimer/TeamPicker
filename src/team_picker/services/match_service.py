@@ -394,6 +394,7 @@ def is_selected_and_confirmed(match_id: int, user_id: int):
         )
         selection = session.execute(query).first()
         if selection is not None:
+            selection = selection._asdict()
             selected = True
             confirmed = selection[M_CONFIRMED]
 

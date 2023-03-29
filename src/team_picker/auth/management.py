@@ -1,7 +1,7 @@
 from typing import Optional, Any
 
-from auth0.v3.authentication import GetToken
-from auth0.v3.management import Auth0
+from auth0.authentication import GetToken
+from auth0.management import Auth0
 
 from ..constants import (
     AUTH0_DOMAIN, NON_INTERACTIVE_CLIENT_ID, NON_INTERACTIVE_CLIENT_SECRET,
@@ -75,11 +75,11 @@ def get_mgmt_api_token() -> str:
     Handle Auth0 callback in AUTHLIB mode
     :return:
     """
-    # https://github.com/auth0/auth0-python#management-sdk-usage
-    get_token = GetToken(config[AUTH0_DOMAIN])
+    # https://github.com/auth0/auth0-python#management-sdk
+    get_token = GetToken(
+        config[AUTH0_DOMAIN], config[NON_INTERACTIVE_CLIENT_ID],
+        client_secret=config[NON_INTERACTIVE_CLIENT_SECRET])
     token = get_token.client_credentials(
-        config[NON_INTERACTIVE_CLIENT_ID],
-        config[NON_INTERACTIVE_CLIENT_SECRET],
         auth0_url('/api/v2/')
     )
     return token['access_token']

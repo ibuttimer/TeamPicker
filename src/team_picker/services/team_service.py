@@ -1,6 +1,7 @@
-from ..constants import RESULT_ONE_TEAM, RESULT_UPDATED_COUNT, \
-    UNASSIGNED_TEAM_NAME
-from ..models import ResultType, Team, M_ID, M_NAME
+from ..constants import (
+    RESULT_ONE_TEAM, RESULT_UPDATED_COUNT, UNASSIGNED_TEAM_NAME
+)
+from ..models import ResultType, Team, M_ID, M_NAME, entity_to_dict
 from .base_service import (get_all, get_by_id, create_entity, delete_by_id,
                            exists_by_id, update_entity, get_one
                            )
@@ -20,8 +21,8 @@ def get_all_team_names():
     Get all team names.
     :return: list of all team names.
     """
-    return [t[M_NAME] for t in get_all(Team, with_entities=Team.name,
-                                       result_type=ResultType.MODEL)]
+    return [entity_to_dict(t)[M_NAME] for t in get_all(
+        Team, with_entities=Team.name, result_type=ResultType.MODEL)]
 
 
 def get_team_by_id(team_id: int, result_type: ResultType = ResultType.DICT):

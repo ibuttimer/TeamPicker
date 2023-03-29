@@ -1,13 +1,14 @@
 from .database import setup_db
-from .db_session import db_session
+from .db_session import db_session, db
 from .models import *
-from .models_misc import ResultType
+from .models_misc import ResultType, MultiDictMixin, entity_to_dict
 
 
 __all__ = [
     "setup_db",
 
     "db_session",
+    "db",
 
     "Role",
     "User",
@@ -35,4 +36,6 @@ __all__ = [
     "M_CONFIRMED",
 
     "ResultType",
+    "MultiDictMixin",
+    "entity_to_dict",
 ]

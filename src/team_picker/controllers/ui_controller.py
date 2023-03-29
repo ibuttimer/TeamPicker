@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from flask import render_template, request, url_for, flash
-from jinja2 import Markup
+from flask import render_template, request, url_for, flash, current_app as app
+from markupsafe import Markup
 from werkzeug.exceptions import abort
 
 from .match_controller_ui import choose_by_home_id, pick_by_home_id
@@ -16,12 +16,9 @@ from ..constants import (NEW_USER_QUERY,
 from ..forms import (RoleForm, set_role_form_choices_validators, NewTeamForm,
                      SetTeamForm, set_team_form_choices_validators
                      )
-from ..models import M_HOME_ID, M_START_TIME, M_AWAY_ID
-from ..models.JsonDeEncoder import JsonEncoder
+from ..models import M_HOME_ID, M_AWAY_ID
 from ..services import get_selected_and_unconfirmed, get_team_name
 from ..util import local_datetime
-
-json_encoder = JsonEncoder()
 
 
 def home():
@@ -73,18 +70,12 @@ def render_dashboard(new_user=False,
 
             flash(
                 Markup(
-                    f'<div>'
-                    f'You have not confirmed availability for '
-                    f'{match[M_START_TIME].strftime(APP_DATETIME_FMT)} '
-                    f'{choose_by_home_id(match[M_HOME_ID], "home", "away")} '
-                    f'match versus {opposition}.'
-                    f'</div>'
-                    f'<div>'
-                    f'<a class="btn btn-default btn-sm" href="{url}">'
-                    f'<i class="fas fa-edit" data-bs-toggle="tooltip" '
-                    f'data-bs-placement="top" title="Confirm availability"></i>'
-                    f'</a>'
-                    f'</div>'
+                    render_template(
+                        'messages/availability_unconfirmed.html',
+                        start_time=match.start_time.strftime(APP_DATETIME_FMT),
+                        venue=choose_by_home_id(match.home_id, "home", "away"),
+                        opposition=opposition,
+                        url=url)
                 )
             )
 
@@ -95,7 +86,7 @@ def render_dashboard(new_user=False,
                            form=form,
                            submit_action=submit_action,
                            submit_text=submit_text,
-                           userinfo_pretty=json_encoder.encode(
+                           userinfo_pretty=app.json.dumps(
                                get_jwt_payload()),
                            last_login=local_datetime(
                                get_jwt_payload_updated_at())

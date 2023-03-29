@@ -6,7 +6,9 @@ import argparse
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
-from typing import Any, Union
+from typing import Any, Union, Tuple
+
+from flask_sqlalchemy import SQLAlchemy
 
 from .auth import (setup_auth, callback_handling, login, logout,
                    is_logged_in, get_profile_role, get_profile,
@@ -85,7 +87,8 @@ def convert_env_var(k):
     return value
 
 
-def create_app(args: argparse.Namespace, test_config=None):
+def create_app(args: argparse.Namespace,
+               test_config=None) -> tuple[Flask, SQLAlchemy]:
     """
     Application factory.
     :param args:        command line arguments
@@ -179,10 +182,11 @@ def create_app(args: argparse.Namespace, test_config=None):
             os.path.join(instance_path, cmd_line_args[GENERATE_API_ARG])
 
     # Setup database.
-    db = setup_db(app, {
-        k: v for k, v in app.config.items()
-        if k.startswith(DB_CONFIG_VAR_PREFIX)
-    }, init=cmd_line_args[INIT_DB_ARG])
+    with app.app_context():
+        db = setup_db(app, {
+            k: v for k, v in app.config.items()
+            if k.startswith(DB_CONFIG_VAR_PREFIX)
+        }, init=cmd_line_args[INIT_DB_ARG])
 
     # Setup authentication.
     # (Server-side sessions need to be disabled for Postman tests)
@@ -370,7 +374,7 @@ def create_app(args: argparse.Namespace, test_config=None):
     def value_error(error):
         return http_error_result(error.status_code, error)
 
-    return app
+    return app, db
 
 
 def process_dict_arg(arg_list: list, args: dict, dflt_val=False) -> Any:

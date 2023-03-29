@@ -6,7 +6,7 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
-from .JsonDeEncoder import JsonEncoder, JsonDecoder
+from .JsonDeEncoder import TPDefaultJSONProvider
 from .db_session import db
 from .models import add_pre_configured
 from ..constants import *
@@ -54,7 +54,7 @@ def make_connection_uri(app: Flask, config: dict) -> str:
 def setup_db(app: Flask, config: dict, init: bool = False) -> SQLAlchemy:
     """
     Initialise the app for the database, binding a flask application and a
-    SQLAlchemy service. Additionally sets custom JSON encoder and decoder for
+    SQLAlchemy service. Additionally, sets custom JSON encoder and decoder for
     the application.
     :param app:      Flask application
     :param config:   database configuration
@@ -80,8 +80,8 @@ def setup_db(app: Flask, config: dict, init: bool = False) -> SQLAlchemy:
     db.app = app
     db.init_app(app)
 
-    app.json_encoder = JsonEncoder
-    app.json_decoder = JsonDecoder
+    app.json_provider_class = TPDefaultJSONProvider
+    app.json = app.json_provider_class(app)
 
     if is_enabled_for(logging.DEBUG):
         logger().debug(fmt_log(f"Initialised database: {connection_uri}"))

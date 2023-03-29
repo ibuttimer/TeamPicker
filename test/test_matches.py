@@ -424,8 +424,6 @@ class MatchesTestCase(BaseTestCase):
                     # Order selections by user id.
                     expected[M_SELECTIONS].sort(key=lambda x: x[M_ID])
 
-        print(f"Expected: {expected}\nNew: {new_match_dict}")
-
         msg = f'{new_match} {tag if tag is not None else ""}'
         with testcase.client as client:
             resp = client.post(MATCHES_URL, json=new_match_dict)

@@ -9,8 +9,10 @@ from werkzeug.datastructures import MultiDict
 
 from .match_controller_api import delete_match_impl
 from ..auth import get_profile_team_id
-from ..auth.auth import requires_auth, Conjunction, check_auth, \
-    get_profile_db_id, get_profile_is_manager
+from ..auth.auth import (
+    requires_auth, Conjunction, check_auth, get_profile_db_id,
+    get_profile_is_manager
+)
 from ..constants import (POST_MATCH_PERMISSION, DELETE_MATCH_PERMISSION,
                          PATCH_MATCH_PERMISSION, GET_MATCH_PERMISSION,
                          NEW_QUERY, UPDATE_QUERY,
@@ -28,7 +30,7 @@ from ..forms.misc import (NO_OPTION_SELECTED, HOME_VENUE, AWAY_VENUE, DateRange,
                           )
 from ..models import (M_START_TIME, M_HOME_ID, M_AWAY_ID, Match, M_ID,
                       M_SCORE_HOME, M_SCORE_AWAY, M_RESULT, M_NAME, M_SURNAME,
-                      M_SELECTIONS
+                      M_SELECTIONS, entity_to_dict
                       )
 from ..models.exception import ModelError
 from ..services import (get_all_matches, get_match_by_id as get_match_by_id_svc,
@@ -148,6 +150,7 @@ def pick_by_home_id(match: dict, home_key: str, away_key: str):
     :param away_key:  key for away value
     :return: 
     """
+    match = entity_to_dict(match)
     return match[
         choose_by_home_id(match, home_key, away_key)
     ]
@@ -610,6 +613,7 @@ def choose_by_home_id(home: Union[int, dict],
     :param away_value:  value representing away
     :return:
     """
+    home = entity_to_dict(home)
     return choose_by_eq(get_profile_team_id(),
                         home if isinstance(home, int) else home[M_HOME_ID],
                         home_value, away_value)
