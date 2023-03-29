@@ -25,10 +25,8 @@ def db_session() -> scoped_session:
         if isinstance(e, IntegrityError):
             raise AbortError(HTTPStatus.UNPROCESSABLE_ENTITY,
                              "Conflicts with existing entry or "
-                             "constraint condition not met")
-        else:
-            raise ServiceUnavailable()
+                             "constraint condition not met") from e
+        raise ServiceUnavailable() from e
 
     finally:
         db.session.close()
-

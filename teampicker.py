@@ -8,4 +8,5 @@ if __name__ == '__main__':
     # parse arguments
     app_args = parse_app_args(sys.argv[1:])
 
-    create_app(args=app_args).run()
+    app, _ = create_app(args=app_args)
+    app.run()

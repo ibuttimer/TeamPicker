@@ -5,14 +5,19 @@ from sqlalchemy import inspect, Row
 
 from werkzeug.datastructures import MultiDict
 
-from team_picker.models.db_session import db
+from .db_session import db
 
 
-# check if model key is a public
-def is_public(k): return k[0] != '_'
+def is_public(k):
+    """
+    Check if model key is public
+    :param k: key
+    :return: True if public
+    """
+    return k[0] != '_'
 
 
-class MultiDictMixin(object):
+class MultiDictMixin():
     """
     Mixin to generate a MultiDict
     """
@@ -100,6 +105,7 @@ class MultiDictMixin(object):
 
 
 class ResultType(Enum):
+    """ Enum of result types """
     DICT = 1    # Return type dictionary.
     MODEL = 2   # Return type SQLAlchemy model.
 
