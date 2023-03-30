@@ -1,15 +1,17 @@
 from typing import Callable
 
+from sqlalchemy import Row
 from sqlalchemy.orm import scoped_session
+from flask_sqlalchemy.query import Query
 
 from ..constants import (RESULT_CREATED_COUNT, RESULT_DELETED_COUNT,
                          RESULT_UPDATED_COUNT
                          )
-from ..models import db_session, ResultType, M_ID, AnyModel
+from ..models import db_session, ResultType, M_ID, AnyModel, entity_to_dict
 
 
 def build_query(base_query, with_entities=None, criteria=None,
-                order_by=None):
+                order_by=None) -> Query:
     """
     Get an entity.
     :param base_query:    base query
@@ -66,7 +68,7 @@ def get_by_id_raw(session: scoped_session, model: AnyModel, entity_id: int):
 
 def get_one(model: AnyModel,
             with_entities=None, criteria=None,
-            result_type: ResultType = ResultType.DICT):
+            result_type: ResultType = ResultType.DICT) -> dict | None:
     """
     Get an entity.
     :param model:       model to query
@@ -76,13 +78,11 @@ def get_one(model: AnyModel,
     :return: entity
     """
     with db_session() as session:
-        entity = build_query(session.query(model),
-                             with_entities=with_entities,
-                             criteria=criteria) \
-            .first()
+        entity = build_query(
+            session.query(model),
+            with_entities=with_entities, criteria=criteria).first()
         if entity is not None and result_type == ResultType.DICT:
-            if with_entities is None:
-                entity = entity.get_dict()
+            entity = entity_to_dict(entity)
 
     return entity
 

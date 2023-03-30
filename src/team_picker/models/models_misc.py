@@ -1,13 +1,23 @@
 from enum import Enum
+from typing import Union
+
+from sqlalchemy import inspect, Row
 
 from werkzeug.datastructures import MultiDict
 
-
-# check if model key is a public
-def is_public(k): return k[0] != '_'
+from .db_session import db
 
 
-class MultiDictMixin(object):
+def is_public(k):
+    """
+    Check if model key is public
+    :param k: key
+    :return: True if public
+    """
+    return k[0] != '_'
+
+
+class MultiDictMixin():
     """
     Mixin to generate a MultiDict
     """
@@ -95,5 +105,34 @@ class MultiDictMixin(object):
 
 
 class ResultType(Enum):
+    """ Enum of result types """
     DICT = 1    # Return type dictionary.
     MODEL = 2   # Return type SQLAlchemy model.
+
+
+def entity_to_dict(entity: Union[MultiDictMixin, Row, db.Model]) -> dict:
+    """
+    Convert a model entity to a dict if possible
+    :param entity: instance to convert
+    :return: dict or original argument if can't convert
+    """
+    if isinstance(entity, MultiDictMixin):
+        entity = entity.get_dict()
+    elif isinstance(entity, Row):
+        entity = entity._asdict()
+    elif isinstance(entity, db.Model):
+        entity = object_as_dict(entity)
+
+    return entity
+
+
+def object_as_dict(obj: db.Model) -> dict:
+    """
+    Convert a Model to a dict
+    https://riptutorial.com/sqlalchemy/example/6614/converting-a-query-result-to-dict
+    :param obj: model to convert
+    :return: dict
+    """
+    return {
+        c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs
+    }

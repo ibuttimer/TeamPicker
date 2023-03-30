@@ -8,7 +8,7 @@ from .logger import (set_logger, logger, set_level, DEFAULT_LOG_LEVEL,
                      is_enabled_for, fmt_log
                      )
 
-from team_picker.util.forms_misc import *
+from .forms_misc import *
 
 __all__ = [
     'success_result',

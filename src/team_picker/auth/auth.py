@@ -104,6 +104,8 @@ def setup_auth(app: Flask, db: SQLAlchemy, no_sessions: bool = False):
             client_kwargs={
                 'scope': 'openid profile email',
             },
+            server_metadata_url=f'https://{config[AUTH0_DOMAIN]}/'
+                                f'.well-known/openid-configuration'
         )
 
         setup_mgmt(config)

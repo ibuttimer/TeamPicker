@@ -89,6 +89,10 @@ class BaseTestCase(unittest.TestCase):
             key: patch(target)
         })
 
+    def get_db(self) -> SQLAlchemy:
+        """ Get the application database instance """
+        return self.app.extensions.get("sqlalchemy")
+
     def setUp(self):
         # Start patching 'auth' functions.
         self.mocker = {
@@ -100,7 +104,7 @@ class BaseTestCase(unittest.TestCase):
         # Configure the mock return values.
         self.setup_mocks()
 
-        """Define test variables and initialize app."""
+        # Define test variables and initialize app
         base_url = 'http://localhost:5000/'
         self.app = create_app(
             args=parse_app_args(
@@ -134,21 +138,16 @@ class BaseTestCase(unittest.TestCase):
 
         # Bind the app to the current context.
         with self.app.app_context():
-            self.db = SQLAlchemy()
-            self.db.init_app(self.app)
-            # create all tables
-            self.db.drop_all()
-            self.db.create_all()
-
-            self.assertEqual(0, self.db.session.query(User).count())
-            self.assertEqual(len(ROLES), self.db.session.query(Role).count())
-            self.assertEqual(1, self.db.session.query(Team).count())
-            self.assertEqual(0, self.db.session.query(Match).count())
-            self.assertEqual(0, self.db.session.query(MatchSelections).count())
+            app_db = self.get_db()
+            self.assertEqual(0, app_db.session.query(User).count())
+            self.assertEqual(len(ROLES), app_db.session.query(Role).count())
+            self.assertEqual(1, app_db.session.query(Team).count())
+            self.assertEqual(0, app_db.session.query(Match).count())
+            self.assertEqual(0, app_db.session.query(MatchSelections).count())
 
             # Get pre-configured roles.
             for _, r in ROLES.items():
-                role = self.db.session.query(Role) \
+                role = app_db.session.query(Role) \
                     .filter(Role.role == r.role) \
                     .first()
                 if role is None:
@@ -156,7 +155,7 @@ class BaseTestCase(unittest.TestCase):
                 r.id = role.id
 
             # Get pre-configured teams.
-            team = self.db.session.query(Team) \
+            team = app_db.session.query(Team) \
                 .filter(Team.name == UNASSIGNED_TEAM_NAME) \
                 .first()
             if team is None:
@@ -171,6 +170,14 @@ class BaseTestCase(unittest.TestCase):
         self.mocker.get(VERIFY_DECODE_JWT).return_value = NO_PERMISSIONS
         self.mocker.get(GET_MGMT_API_TOKEN).return_value = \
             "no mgmt token required as it's ignored"
+
+    def context_wrapper(self, func):
+        """
+        Wrapper to run function in app context
+        :param func: function to run
+        """
+        with self.app.app_context():
+            func()
 
     @staticmethod
     def get_permissions_and_role(user_type: UserType,

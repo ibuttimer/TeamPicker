@@ -21,6 +21,7 @@ CONFIRMED_STATUS = 3
 
 
 class DateRange(IntEnum):
+    """ Enum of date ranges """
     IGNORE_DATE = auto()
     BEFORE_DATE = auto()
     BEFORE_OR_EQUAL_DATE = auto()
@@ -57,6 +58,7 @@ DATE_RANGES = [s[0] for s in DATE_RANGE_CHOICES]
 
 
 class FormArgs(IntEnum):
+    """ Enum of form args """
     CURRENT_MIN = auto()    # Only future date/times allowed
     FREE_MIN = auto()       # Past date/times allowed
     TEAM_REQ = auto()       # Team selection required

@@ -12,8 +12,10 @@ from ..constants import (RESULT_UPDATED_COUNT, RESULT_ONE_MATCH,
                          DATE_RANGE, NO_ARG, YES_ARG, SELECT_QUERY, MAYBE_ARG,
                          TOGGLE_ARG, TEAM
                          )
-from ..util import NO_OPTION_SELECTED, DateRange, NO_STATUS, CONFIRMED_STATUS, \
+from ..util import (
+    NO_OPTION_SELECTED, DateRange, NO_STATUS, CONFIRMED_STATUS,
     NOT_AVAILABLE_STATUS, MAYBE_STATUS
+)
 from ..models import (ResultType, Match, M_SELECTIONS, M_ID, M_START_TIME,
                       db_session, M_AWAY_ID, M_HOME_ID, MatchSelections,
                       M_CONFIRMED
@@ -394,6 +396,7 @@ def is_selected_and_confirmed(match_id: int, user_id: int):
         )
         selection = session.execute(query).first()
         if selection is not None:
+            selection = selection._asdict()
             selected = True
             confirmed = selection[M_CONFIRMED]
 

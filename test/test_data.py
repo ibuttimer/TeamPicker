@@ -3,10 +3,11 @@ Test data classes corresponding to database models.
 """
 from copy import deepcopy
 from datetime import datetime
-from typing import List
 
-from team_picker import MANAGER_ROLE, PLAYER_ROLE, UNASSIGNED_TEAM_NAME, \
-    APP_DATETIME_FMT, MANAGER_ROLE_NAME, PLAYER_ROLE_NAME
+from team_picker.constants import (
+    MANAGER_ROLE, PLAYER_ROLE, UNASSIGNED_TEAM_NAME, APP_DATETIME_FMT,
+    MANAGER_ROLE_NAME, PLAYER_ROLE_NAME
+)
 from team_picker.models import Role, Team, User, Match, M_ID
 
 
