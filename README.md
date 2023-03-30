@@ -163,6 +163,7 @@ The following are the details of the Auth0 API:
 
 #### Database schema
 The following database schema has been implemented:
+
 ![Database schema](doc/db_schema.jpg)
 
 #### Install dependencies
@@ -211,6 +212,14 @@ For example, to configure the application to use:
 
     > If a variable is defined in both `.env` and as a system environment variable, the system environment variable has precedence.  
 
+##### Setting environment variables
+Depending on the operations system, environment variables are set differently:
+
+```shell
+For Linux and Mac:                  For Windows:                    For PowerShell:
+$ export VARIABLE_NAME=value        > set VARIABLE_NAME=value       > $Env:VARIABLE_NAME=value
+```
+
 ##### Configuration file
 * The configuration file should follow the format specified by [sample-config.py](instance/sample-config.py).
 * The environment variables determine which configuration file to load.
@@ -249,11 +258,12 @@ For example, to configure the application to use:
 
 3. Set the environment variables, `APP_CONFIG_PATH` and `INST_REL_CONFIG` appropriately.
 
-    ```shell
-    For Linux and Mac:                            For Windows:
-    $ export APP_CONFIG_PATH=config.py            > set APP_CONFIG_PATH=config.py
-    $ export INST_REL_CONFIG=true                 > set INST_REL_CONFIG=true
-    ```
+    | Variable                    | Value     |
+    |-----------------------------|-----------|
+    | APP_CONFIG_PATH             | config.py |
+    | INST_REL_CONFIG             | true      |
+    See [Setting environment variables](#setting-environment-variables).
+
 ##### Environment variables
 Environment variables corresponding to the keys in [sample.env](instance/sample.env) and [sample-config.py](instance/sample-config.py)
 should be set as appropriate.
@@ -263,19 +273,19 @@ An appropriately updated copy of the bash script [sample.env.sh](sample.env.sh) 
 For example, to configure the application to use:
 * an SQLite database file `database.db` in the [instance](instance) folder
 
-    ```shell
-    For Linux and Mac:                            For Windows:
-    $ export INST_REL_CONFIG=true                 > set INST_REL_CONFIG=true
-    
-    $ export DB_DIALECT=sqlite                    > set DB_DIALECT=sqlite
-    $ export DB_DATABASE=database.db              > set DB_DATABASE=database.db
-    $ export DB_INSTANCE_RELATIVE_CONFIG=True     > set DB_INSTANCE_RELATIVE_CONFIG=True
-    
-    $ export AUTH0_DOMAIN=udacity-fsnd.auth0.com  > set AUTH0_DOMAIN=udacity-fsnd.auth0.com
-    $ export ALGORITHMS=['RS256']                 > set ALGORITHMS=['RS256']
-    $ export AUTH0_AUDIENCE=dev                   > set AUTH0_AUDIENCE=dev
-    ...
-    ```
+  Set environment variables:
+
+  | Variable                    | Value                  |
+  |-----------------------------|------------------------|
+  | INST_REL_CONFIG             | true                   |
+  | DB_DIALECT                  | sqlite                 |
+  | DB_DATABASE                 | database.db            |
+  | DB_INSTANCE_RELATIVE_CONFIG | True                   |
+  | AUTH0_DOMAIN                | udacity-fsnd.auth0.com |
+  | ALGORITHMS                  | ['RS256']              |
+  | AUTH0_AUDIENCE              | dev                    |
+  See [Setting environment variables](#setting-environment-variables).
+
 > For convenience, the location of the [instance folder](https://flask.palletsprojects.com/en/2.0.x/config/#instance-folders)
 > has been hardcoded to [instance](instance), as the default location determined by Flask
 > varies depending on whether the application or test scripts are running. Please see
@@ -331,23 +341,24 @@ the database must be prepared for the application as follows:
 * Open a [Terminal Window](#terminal-window).
 * Set environment variables as detailed in [Run the application](#run-the-application).  
 * Run the command `flask db upgrade` or `python -m flask db upgrade`
-    ```bash
-    For Linux and Mac:
-    $ export FLASK_APP=src.team_picker:create_app({})
-    $ flask db upgrade 
-    
-    For Windows:
-    > set FLASK_APP=src.team_picker:create_app({})
+
+  Set environment variables:
+
+  | Variable            | Value                                     |
+  |---------------------|-------------------------------------------|
+  | FLASK_APP           | see [Run using `flask`](#run-using-flask) |
+  | PYTHONPATH          | see [Set python path](#set-python-path)   |
+
+  ```bash
     > flask db upgrade 
-    ```
+  ```
   This will configure the database to the state required by the application, using the script [5604eccbf36a_initial_migration.py](migrations/versions/5604eccbf36a_initial_migration.py).
 
 #### Database Initialisation
 Once the database has been migrated, it may be re-initialised by specifying the [Initialise the database (--initdb)](#initialise-the-database---initdb) application argument.
 When running as a script:
 ```shell
-For Linux and Mac:                                For Windows:
-$ python teampicker.py --initdb                   > python teampicker.py --initdb
+> python teampicker.py --initdb
 ```
 or passed via the `FLASK_APP` environment variable.
 ```bash
@@ -359,32 +370,44 @@ The application can be run using the `flask` command or directly by running the 
 
 Once an appropriate configuration has been created as per [Application Configuration](#application-configuration),
 from a [Terminal Window](#terminal-window), run the following commands:
+
 ```bash
 For Linux and Mac:                                For Windows:
 $ cd /path/to/project                             > cd \path\to\project
-$ export PYTHONPATH=/path/to/project/src          > set PYTHONPATH=/path/to/project/src
 ```
+
+#### Set python path
+Set environment variables:
+
+  | Variable            | Value                          |
+  |---------------------|--------------------------------|
+  | PYTHONPATH          | /path/to/project/src           |
+  See [Setting environment variables](#setting-environment-variables).
+
 #### Run using script
 From a [Terminal Window](#terminal-window), run the following commands:
 ```bash
-For Linux and Mac:                                For Windows:
-$ python teampicker.py                            > python teampicker.py
+> python teampicker.py
 ```
 #### Run using `flask`
+
+Set environment variables:
+
+| Variable            | Value                          |
+|---------------------|--------------------------------|
+| FLASK_APP           | src.team_picker:create_app({}) |
+See [Setting environment variables](#setting-environment-variables).
+
 From a [Terminal Window](#terminal-window), run the following commands:
 ```bash
-For Linux and Mac:                                For Windows:
-$ export FLASK_APP=src.team_picker:create_app({}) > set FLASK_APP=src.team_picker:create_app({})
-$ flask run                                       > flask run 
+> flask run 
 ```
 See [Run The Application](https://flask.palletsprojects.com/en/2.0.x/tutorial/factory/#run-the-application) for other operating systems.
 
 #### Run in debug mode
 > **Note:** To run with debug mode enabled specify the `--debug` [option](https://flask.palletsprojects.com/en/2.2.x/config/#debug-mode)
 ```bash
-For Linux and Mac:                                For Windows:
-$ export FLASK_APP=src.team_picker:create_app({}) > set FLASK_APP=src.team_picker:create_app({})
-$ flask run --debug                               > flask run --debug 
+> flask run --debug 
 ```
 
 ### Test
@@ -393,11 +416,16 @@ A number of unit tests are available in the [test](test) folder.
 The tests are performed against an in-memory sqlite database. 
 
 From a [Terminal Window](#terminal-window), run the following commands to run all tests:
+
 ```bash
 For Linux and Mac:                            For Windows:
 $ cd /path/to/project/test                    > cd \path\to\project\test
-$ export PYTHONPATH=/path/to/project/src      > set PYTHONPATH=/path/to/project/src
-$ python -m test_all                          > python -m test_all
+```
+
+Set python path, see [Set python path](#set-python-path).
+
+```bash
+> python -m test_all
 ```
 
 Alternatively, to run tests individually:
@@ -450,8 +478,7 @@ and player's in [players.json](test/postman/players.json).
 
 When running as a script:
 ```shell
-For Linux and Mac:                                For Windows:
-$ python teampicker.py --postman_test             > python teampicker.py --postman_test
+> python teampicker.py --postman_test
 ```
 or passed via the `FLASK_APP` environment variable.
 ```bash
