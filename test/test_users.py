@@ -89,6 +89,7 @@ class UsersTestCase(BaseTestCase):
         users = {}
         with test_case.app.app_context():
             # Add required users.
+            app_db = test_case.get_db()
             for k, u in USERS.items():
                 # Use role name at start of key to associate role
                 # (i.e. MANAGER_ROLE/PLAYER_ROLE).
@@ -96,13 +97,13 @@ class UsersTestCase(BaseTestCase):
                 # Use number id at end of key to associate team.
                 u.team_id = teams[k[-1]][M_ID]
                 user = u.to_model(ignore=[M_ID])
-                test_case.db.session.add(user)
-                test_case.db.session.flush()
+                app_db.session.add(user)
+                app_db.session.flush()
                 u.id = user.id
 
                 users[k] = u.to_dict()
 
-            test_case.db.session.commit()
+            app_db.session.commit()
 
         return users, teams
 

@@ -3,6 +3,8 @@ from http import HTTPStatus
 from typing import Union, Any, Optional, List
 from unittest.mock import patch
 
+from flask_sqlalchemy import SQLAlchemy
+
 from misc import MatchParam, UserType
 from team_picker import create_app, parse_app_args, INIT_DB_ARG_LONG
 from team_picker.constants import *
@@ -87,6 +89,10 @@ class BaseTestCase(unittest.TestCase):
             key: patch(target)
         })
 
+    def get_db(self) -> SQLAlchemy:
+        """ Get the application database instance """
+        return self.app.extensions.get("sqlalchemy")
+
     def setUp(self):
         # Start patching 'auth' functions.
         self.mocker = {
@@ -98,9 +104,9 @@ class BaseTestCase(unittest.TestCase):
         # Configure the mock return values.
         self.setup_mocks()
 
-        """Define test variables and initialize app."""
+        # Define test variables and initialize app
         base_url = 'http://localhost:5000/'
-        self.app, self.db = create_app(
+        self.app = create_app(
             args=parse_app_args(
                 f'--{INIT_DB_ARG_LONG}'.split()),
             test_config={
@@ -132,15 +138,16 @@ class BaseTestCase(unittest.TestCase):
 
         # Bind the app to the current context.
         with self.app.app_context():
-            self.assertEqual(0, self.db.session.query(User).count())
-            self.assertEqual(len(ROLES), self.db.session.query(Role).count())
-            self.assertEqual(1, self.db.session.query(Team).count())
-            self.assertEqual(0, self.db.session.query(Match).count())
-            self.assertEqual(0, self.db.session.query(MatchSelections).count())
+            app_db = self.get_db()
+            self.assertEqual(0, app_db.session.query(User).count())
+            self.assertEqual(len(ROLES), app_db.session.query(Role).count())
+            self.assertEqual(1, app_db.session.query(Team).count())
+            self.assertEqual(0, app_db.session.query(Match).count())
+            self.assertEqual(0, app_db.session.query(MatchSelections).count())
 
             # Get pre-configured roles.
             for _, r in ROLES.items():
-                role = self.db.session.query(Role) \
+                role = app_db.session.query(Role) \
                     .filter(Role.role == r.role) \
                     .first()
                 if role is None:
@@ -148,7 +155,7 @@ class BaseTestCase(unittest.TestCase):
                 r.id = role.id
 
             # Get pre-configured teams.
-            team = self.db.session.query(Team) \
+            team = app_db.session.query(Team) \
                 .filter(Team.name == UNASSIGNED_TEAM_NAME) \
                 .first()
             if team is None:

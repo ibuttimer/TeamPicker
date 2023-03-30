@@ -165,10 +165,11 @@ class TestMatchUiCase(UiBaseTestCase):
 
         # Persist users and teams and teams to database.
         with self.app.app_context():
+            app_db = self.get_db()
             for _, team_data in self.teams.items():
                 team = team_data.to_model(ignore=[M_ID])
-                self.db.session.add(team)
-                self.db.session.flush()
+                app_db.session.add(team)
+                app_db.session.flush()
                 team_data.id = team.id
 
             for key, user_data in self.users.items():
@@ -176,12 +177,12 @@ class TestMatchUiCase(UiBaseTestCase):
 
                 user = user_data.to_model(ignore=[M_ID])
                 user.team_id = self.teams.get(team_name).id
-                self.db.session.add(user)
-                self.db.session.flush()
+                app_db.session.add(user)
+                app_db.session.flush()
                 user_data.id = user.id
                 user_data.team_id = user.team_id
 
-            self.db.session.commit()
+            app_db.session.commit()
 
         self.user_dicts = {v.id: v.to_dict() for _, v in self.users.items()}
 

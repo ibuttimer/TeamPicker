@@ -103,10 +103,11 @@ class MatchesTestCase(BaseTestCase):
         matches = {}
         with test_case.app.app_context():
             # Get player models
+            app_db = test_case.get_db()
             players = {}
             for k, u in users.items():
                 if k.startswith(PLAYER_ROLE):
-                    players[k] = test_case.db.session.query(User) \
+                    players[k] = app_db.session.query(User) \
                         .filter(User.id == u[M_ID]) \
                         .first()
 
@@ -127,8 +128,8 @@ class MatchesTestCase(BaseTestCase):
                 m.away_id = teams[away_num][M_ID]
                 match = m.to_model(ignore=[M_ID, M_SELECTIONS])
 
-                test_case.db.session.add(match)
-                test_case.db.session.flush()
+                app_db.session.add(match)
+                app_db.session.flush()
                 m.id = match.id
 
                 # Use team numbers to add player selections
@@ -137,13 +138,13 @@ class MatchesTestCase(BaseTestCase):
                     m.selections.append(users[key])
                     match.selections.append(players[key])
 
-                test_case.db.session.flush()
+                app_db.session.flush()
 
                 matches[k] = m.to_dict()
                 # Standardise selection to ascending player id order.
                 matches[k][M_SELECTIONS].sort(key=lambda s: s[M_ID])
 
-            test_case.db.session.commit()
+            app_db.session.commit()
 
         return users, teams, matches
 

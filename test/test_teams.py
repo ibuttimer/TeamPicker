@@ -61,15 +61,16 @@ class TeamsTestCase(BaseTestCase):
         }
         with test_case.app.app_context():
             # Add required teams.
+            app_db = test_case.get_db()
             for k, team_data in TEAMS.items():
                 team = team_data.to_model(ignore=[M_ID])
-                test_case.db.session.add(team)
-                test_case.db.session.flush()
+                app_db.session.add(team)
+                app_db.session.flush()
                 team_data.id = team.id
 
                 teams[k] = team_data.to_dict()
 
-            test_case.db.session.commit()
+            app_db.session.commit()
 
         return teams
 

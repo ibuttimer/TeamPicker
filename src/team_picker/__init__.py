@@ -6,16 +6,29 @@ import argparse
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
-from typing import Any, Union, Tuple
-
-from flask_sqlalchemy import SQLAlchemy
+from typing import Any, Union
 
 from .auth import (setup_auth, callback_handling, login, logout,
                    is_logged_in, get_profile_role, get_profile,
                    get_profile_setup_complete
                    )
 from .auth.exception import AuthError
-from .constants import *
+from .constants import (DEBUG, TESTING, DB_INSTANCE_RELATIVE_CONFIG,
+                        INIT_DB_ARG, POSTMAN_TEST_ARG, DB_URI, DB_URI_ENV_VAR,
+                        DB_DRIVER, DB_USERNAME, DB_PASSWORD, GENERATE_API_ARG,
+                        DB_HOST, DB_PORT, PERMANENT_SESSION_LIFETIME,
+                        ALGORITHMS, INST_REL_CONFIG, APP_CONFIG_PATH,
+                        ALL_CONFIG_VARIABLES, LOG_LEVEL, CMD_LINE_ARGS,
+                        DB_CONFIG_VAR_PREFIX, API_URL,
+                        HOME_URL, GET, PATCH, POST, DELETE,
+                        DASHBOARD_URL, LOGIN_URL, CALLBACK_URL, LOGOUT_URL,
+                        USER_SETUP_URL, USER_BY_ID_TEAM_URL, MATCHES_UI_URL,
+                        MATCH_BY_ID_UI_URL, SEARCH_MATCH_URL,
+                        MATCH_SELECTIONS_UI_URL, MATCH_USER_SELECTION_UI_URL,
+                        MATCH_USER_CONFIRM_UI_URL, ROLES_URL, ROLE_BY_ID_URL,
+                        USERS_URL, USER_BY_ID_URL, TEAMS_URL, TEAM_SETUP_URL,
+                        TEAM_BY_ID_URL, MATCHES_URL, MATCH_BY_ID_URL,
+                        TOKEN_LOGIN_URL)
 from .controllers import (all_roles, get_role_by_id,
                           all_users, get_user_by_id, create_user,
                           delete_user, update_user, setup_user,
@@ -87,13 +100,12 @@ def convert_env_var(k):
     return value
 
 
-def create_app(args: argparse.Namespace,
-               test_config=None) -> tuple[Flask, SQLAlchemy]:
+def create_app(args: argparse.Namespace, test_config=None) -> Flask:
     """
     Application factory.
     :param args:        command line arguments
     :param test_config: test configuration
-    :return:
+    :return: application
     """
     # Create app
     inst_rel_config = False  # Default is absolute config path.
@@ -183,14 +195,14 @@ def create_app(args: argparse.Namespace,
 
     # Setup database.
     with app.app_context():
-        db = setup_db(app, {
+        app_db = setup_db(app, {
             k: v for k, v in app.config.items()
             if k.startswith(DB_CONFIG_VAR_PREFIX)
         }, init=cmd_line_args[INIT_DB_ARG])
 
     # Setup authentication.
     # (Server-side sessions need to be disabled for Postman tests)
-    setup_auth(app, db, no_sessions=cmd_line_args[POSTMAN_TEST_ARG])
+    setup_auth(app, app_db, no_sessions=cmd_line_args[POSTMAN_TEST_ARG])
 
     # CORS(app)
     cors = CORS(app, resources={
@@ -215,13 +227,10 @@ def create_app(args: argparse.Namespace,
             # https://stackoverflow.com/a/42888467
             print(str(message))
 
-        return dict(
-            logged_in=is_logged_in(),
-            setup_complete=get_profile_setup_complete(),
-            role=get_profile_role(),
-            userinfo=get_profile(),
-            mdebug=print_in_console
-        )
+        return {'logged_in': is_logged_in(),
+                'setup_complete': get_profile_setup_complete(),
+                'role': get_profile_role(), 'userinfo': get_profile(),
+                'mdebug': print_in_console}
 
     # Routes
     new_file = True
@@ -374,7 +383,7 @@ def create_app(args: argparse.Namespace,
     def value_error(error):
         return http_error_result(error.status_code, error)
 
-    return app, db
+    return app
 
 
 def process_dict_arg(arg_list: list, args: dict, dflt_val=False) -> Any:
@@ -438,13 +447,18 @@ def add_url_rule(app, endpoint_info, generate_api: Union[bool, str] = False,
                        f"}}\n" \
                        f"```\n\n"
 
-        with open(generate_api, mode) as f:
-            f.write(markdown)
+        with open(generate_api, mode, encoding='utf-8') as filehandle:
+            filehandle.write(markdown)
 
     app.add_url_rule(endpoint, view_func=view_func, methods=methods)
 
 
-def parse_app_args(argv: list):
+def parse_app_args(argv: list) -> argparse.Namespace:
+    """
+    Parse arguments
+    :param argv: command line arguments
+    :return: argument namespace
+    """
     # parse arguments
     parser = argparse.ArgumentParser(prog='TeamPicker')
     parser.add_argument(f"-{INIT_DB_ARG_SHORT}", f"--{INIT_DB_ARG_LONG}",
@@ -462,4 +476,3 @@ def parse_app_args(argv: list):
 
     args = parser.parse_args(argv)
     return args
-
