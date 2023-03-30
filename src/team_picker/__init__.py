@@ -13,7 +13,8 @@ from .auth import (setup_auth, callback_handling, login, logout,
                    get_profile_setup_complete
                    )
 from .auth.exception import AuthError
-from .constants import (DEBUG, TESTING, DB_INSTANCE_RELATIVE_CONFIG,
+from .constants import (UNASSIGNED_TEAM_NAME, PRE_CONFIG_ROLE_NAMES,
+                        DEBUG, TESTING, DB_INSTANCE_RELATIVE_CONFIG,
                         INIT_DB_ARG, POSTMAN_TEST_ARG, DB_URI, DB_URI_ENV_VAR,
                         DB_DRIVER, DB_USERNAME, DB_PASSWORD, GENERATE_API_ARG,
                         DB_HOST, DB_PORT, PERMANENT_SESSION_LIFETIME,
