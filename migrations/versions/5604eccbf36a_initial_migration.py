@@ -8,7 +8,7 @@ Create Date: 2021-07-20 12:21:34.378283
 from alembic import op
 import sqlalchemy as sa
 
-from team_picker import UNASSIGNED_TEAM_NAME, PRE_CONFIG_ROLE_NAMES
+from team_picker.constants import UNASSIGNED_TEAM_NAME, PRE_CONFIG_ROLE_NAMES
 
 # revision identifiers, used by Alembic.
 revision = '5604eccbf36a'
